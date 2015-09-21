@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
-# Create your models here.
+import datetime
+
 
 
 class hardware(models.Model):
@@ -37,7 +38,13 @@ class contact(models.Model):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
 
 
+class airbill(models.Model):
+    tracking   = models.CharField(max_length=100, primary_key=True)
+    lastStatus = models.CharField (max_length=100, blank=True)
+    used       = models.BooleanField (default=False)
 
+    def __str__(self):
+        return self.tracking
 
 
 class event(models.Model):
@@ -52,11 +59,18 @@ class event(models.Model):
     status     = models.CharField(max_length=100, choices=status_choices, default='Event')
     startDate  = models.DateField(max_length=100, blank=True)
     endDate    = models.DateField(max_length=100, blank=True)
+
     hwAssigned = models.ManyToManyField(hardware, blank=True)
     ctAssigned = models.ManyToManyField(contact, through='contact_event', blank=True)
+    abAssigned = models.ManyToManyField(airbill, through='event_airbill', blank=True)
 
     def __str__(self):
         return self.name
+
+
+    @property
+    def startWeek(self):
+        return self.startDate.isocalendar()[1]
 
 
 class contact_event(models.Model):
@@ -69,3 +83,11 @@ class contact_event(models.Model):
     def __str__(self):
         return self.ctId.firstName + ' ' + self.ctId.lastName + '<>' + self.evId.name
 
+class event_airbill(models.Model):
+
+    evId = models.ForeignKey(event)
+    tracking = models.ForeignKey(airbill)
+    toEvent  = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tracking.tracking + ' <> ' + self.evId.name
