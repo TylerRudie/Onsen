@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from datetime import *
 from .models import *
 
 
@@ -25,9 +25,13 @@ class HardwareAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    fields = ['name','status','startDate','endDate','hwAssigned']
-    inlines = [ctEventID, abEvent]
+    model = event
+    #fields = ['name','status','startDate','endDate','hwAssigned' ]
 
+    inlines = [ctEventID, abEvent]
+    list_display = ['name', 'startDate', 'endDate']
+    ordering = ['startDate']
+    list_filter = ['startDate']
 
 admin.site.register(event, EventAdmin)
 admin.site.register(contact )

@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-import datetime
+
 
 
 
@@ -57,20 +57,23 @@ class event(models.Model):
     evId       = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name       = models.CharField(max_length=100)
     status     = models.CharField(max_length=100, choices=status_choices, default='Event')
-    startDate  = models.DateField(max_length=100, blank=True)
-    endDate    = models.DateField(max_length=100, blank=True)
+    startDate  = models.DateField('Start Date', max_length=100, blank=True )
+    endDate    = models.DateField('End Date', max_length=100, blank=True)
 
-    hwAssigned = models.ManyToManyField(hardware, blank=True)
-    ctAssigned = models.ManyToManyField(contact, through='contact_event', blank=True)
-    abAssigned = models.ManyToManyField(airbill, through='event_airbill', blank=True)
+    hwAssigned = models.ManyToManyField(hardware, blank=True, verbose_name='Assigned Hardware')
+    ctAssigned = models.ManyToManyField(contact, through='contact_event', blank=True, verbose_name='Assigned Contacts')
+    abAssigned = models.ManyToManyField(airbill, through='event_airbill', blank=True, verbose_name='Assigned Airbills')
 
     def __str__(self):
         return self.name
 
 
-    @property
-    def startWeek(self):
+    def _getStartWeek(self):
         return self.startDate.isocalendar()[1]
+    startWeek = property(_getStartWeek)
+
+
+
 
 
 class contact_event(models.Model):
@@ -83,6 +86,9 @@ class contact_event(models.Model):
     def __str__(self):
         return self.ctId.firstName + ' ' + self.ctId.lastName + '<>' + self.evId.name
 
+    class meta:
+        verbose_name = 'Assigned Contacts'
+
 class event_airbill(models.Model):
 
     evId = models.ForeignKey(event)
@@ -91,3 +97,6 @@ class event_airbill(models.Model):
 
     def __str__(self):
         return self.tracking.tracking + ' <> ' + self.evId.name
+
+    class meta:
+        verbose_name = 'Assigned Airbill'
