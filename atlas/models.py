@@ -1,4 +1,5 @@
 from django.db import models
+
 import uuid
 
 
@@ -54,22 +55,38 @@ class event(models.Model):
         ('p','Pool'),
     )
 
-    evId       = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name       = models.CharField(max_length=100)
-    status     = models.CharField(max_length=100, choices=status_choices, default='Event')
-    startDate  = models.DateField('Start Date', max_length=100, blank=True )
-    endDate    = models.DateField('End Date', max_length=100, blank=True)
+    evId =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField('Title', blank=True, max_length=200)
+    start = models.DateTimeField('Start')
+    end   = models.DateTimeField('End')
+    all_day = models.BooleanField('All day', default=False)
 
-    hwAssigned = models.ManyToManyField(hardware, blank=True, verbose_name='Assigned Hardware')
-    ctAssigned = models.ManyToManyField(contact, through='contact_event', blank=True, verbose_name='Assigned Contacts')
-    abAssigned = models.ManyToManyField(airbill, through='event_airbill', blank=True, verbose_name='Assigned Airbills')
+    status = models.CharField(max_length=100,
+                              choices=status_choices,
+                              default='Event')
+    hwAssigned = models.ManyToManyField(hardware,
+                                        blank=True,
+                                        verbose_name='Assigned Hardware')
+    ctAssigned = models.ManyToManyField(contact,
+                                        through='contact_event',
+                                        blank=True,
+                                        verbose_name='Assigned Contacts')
+    abAssigned = models.ManyToManyField(airbill,
+                                        through='event_airbill',
+                                        blank=True,
+                                        verbose_name='Assigned Airbills')
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        verbose_name = 'Event'
+        verbose_name_plural = 'Events'
+
+    def __unicode__(self):
+        return self.title
 
 
     def _getStartWeek(self):
         return self.startDate.isocalendar()[1]
+
     startWeek = property(_getStartWeek)
 
 
@@ -88,6 +105,8 @@ class contact_event(models.Model):
 
     class meta:
         verbose_name = 'Assigned Contacts'
+
+
 
 class event_airbill(models.Model):
 

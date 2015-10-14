@@ -1,0 +1,18 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load fullcalendar_tags %}
+
+{% block head_title %}Calandar - {% endblock %}
+
+{% block Calandar_Support %}
+   <script src="{% static 'js/jquery.min.js'%}"></script>
+   {% fullcalendar_jquery_ui %}
+   {% fullcalendar_javascript %}
+   {% calendar_init calendar_config_options %}
+{% endblock %}
+
+ {%  block content %}
+
+    {% calendar %}
+
+ {% endblock %}

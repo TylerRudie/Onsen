@@ -21,7 +21,7 @@ class abEvent(admin.TabularInline):
 
 class HardwareAdmin(admin.ModelAdmin):
     fields = ['serialNum','desc','config','status']
-    inlines = [EventInline]
+
 
 
 class EventAdmin(admin.ModelAdmin):
@@ -29,9 +29,9 @@ class EventAdmin(admin.ModelAdmin):
     #fields = ['name','status','startDate','endDate','hwAssigned' ]
 
     inlines = [ctEventID, abEvent]
-    list_display = ['name', 'startDate', 'endDate']
-    ordering = ['startDate']
-    list_filter = ['startDate']
+    list_display = ['title', 'start', 'end']
+    ordering = ['start']
+    list_filter = ['start']
 
 admin.site.register(event, EventAdmin)
 admin.site.register(contact )
