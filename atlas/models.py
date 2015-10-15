@@ -4,17 +4,28 @@ import uuid
 
 
 class contact(models.Model):
-    ctID      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    firstName = models.CharField(max_length=100, blank=True)
-    lastName  = models.CharField(max_length=100, blank=True)
-    address1  = models.CharField(max_length=100, blank=True)
-    address2  = models.CharField(max_length=100, blank=True)
-    city      = models.CharField(max_length=100, blank=True)
-    state     = models.CharField(max_length=100, blank=True)
-    zip       = models.CharField(max_length=100, blank=True)
-    phone     = models.CharField(max_length=100, blank=True)
+    ctID      = models.UUIDField(primary_key=True,
+                                 default=uuid.uuid4,
+                                 editable=False)
+    firstName = models.CharField(max_length=100,
+                                 blank=True)
+    lastName  = models.CharField(max_length=100,
+                                 blank=True)
+    address1  = models.CharField(max_length=100,
+                                 blank=True)
+    address2  = models.CharField(max_length=100,
+                                 blank=True)
+    city      = models.CharField(max_length=100,
+                                 blank=True)
+    state     = models.CharField(max_length=100,
+                                 blank=True)
+    zip       = models.CharField(max_length=100,
+                                 blank=True)
+    phone     = models.CharField(max_length=100,
+                                 blank=True)
     email     = models.EmailField(blank=True)
-    company   = models.CharField(max_length=100, blank=True)
+    company   = models.CharField(max_length=100,
+                                 blank=True)
     def __str__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
 
@@ -34,12 +45,18 @@ class hardware(models.Model):
     #     ('s','Standby'),
     #     ('i','Inactive'),
     # )
-    hwId      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    hwId      = models.UUIDField(primary_key=True,
+                                 default=uuid.uuid4,
+                                 editable=False)
     serialNum = models.CharField(max_length=100)
-    desc      = models.CharField(max_length=100, blank=True)
-    config    = models.CharField(max_length=100, blank=True)
-    type      = models.CharField(max_length=100, blank=True)
-    poolID    = models.ForeignKey(pool, blank=True, null=True)
+    desc      = models.CharField(max_length=100,
+                                 blank=True)
+    config    = models.CharField(max_length=100,
+                                 blank=True)
+    type      = models.CharField(max_length=100,
+                                 blank=True)
+    poolID    = models.ForeignKey(pool, blank=True,
+                                  null=True)
 
     def __str__(self):
         return self.serialNum
@@ -68,15 +85,22 @@ class event(models.Model):
         # ('p','Pool'),
     )
 
-    evID =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField('Title', blank=True, max_length=200)
+    evID =  models.UUIDField(primary_key=True,
+                             default=uuid.uuid4,
+                             editable=False)
+    title = models.CharField('Title',
+                             blank=True,
+                             max_length=200)
     start = models.DateTimeField('Start')
     end   = models.DateTimeField('End')
-    all_day = models.BooleanField('All day', default=False)
-    laptopsRequested = models.IntegerField(blank=True, null=True)
+    all_day = models.BooleanField('All day',
+                                  default=False)
+    laptopsRequested = models.IntegerField(blank=True,
+                                           null=True)
     projectorRequested = models.BooleanField(default=False)
-    dateShipped = models.DateField('Date Shipped', blank=True, null=True)
-
+    dateShipped = models.DateField('Date Shipped',
+                                   blank=True,
+                                   null=True)
     status = models.CharField(max_length=100,
                               choices=status_choices,
                               default='Event')
@@ -94,12 +118,12 @@ class event(models.Model):
                                         blank=True,
                                         verbose_name='Assigned Airbills')
 
-    caseAssigned = models.ManyToManyField(case, blank=True, null=True)
+    caseAssigned = models.ManyToManyField(case, blank=True)
 
     site = models.CharField(max_length=200, blank=True)
 
     nextEvent = models.ForeignKey("self",  blank=True, null=True, verbose_name='Next Event')
-
+    pool = models.ForeignKey(pool, blank=True, null=True, verbose_name='Pool')
 
     class Meta:
         verbose_name = 'Event'
@@ -129,7 +153,7 @@ class contact_event(models.Model):
     isInst     = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.ctId.firstName + ' ' + self.ctId.lastName + '<>' + self.evId.name
+        return self.ctID.firstName + ' ' + self.ctID.lastName + '<>' + self.evID.title
 
     class meta:
         verbose_name = 'Assigned Contacts'
@@ -152,10 +176,18 @@ class event_airbill(models.Model):
 class assignment(models.Model):
     eventID = models.ForeignKey(event)
     hardwareID = models.ForeignKey(hardware)
-    outTimeStamp = models.DateTimeField('Outbound Timestamp', blank=True)
-    outUser = models.ForeignKey(User, blank=True, related_name='checkout_user')
-    inTimeStamp = models.DateTimeField('Inbound Timestamp', blank=True)
-    inUser = models.ForeignKey(User, blank=True, related_name='checkin_user')
+    outTimeStamp = models.DateTimeField('Outbound Timestamp',
+                                        blank=True,
+                                        null=True)
+    outUser = models.ForeignKey(User, blank=True,
+                                related_name='checkout_user',
+                                null=True)
+    inTimeStamp = models.DateTimeField('Inbound Timestamp',
+                                       blank=True,
+                                       null=True)
+    inUser = models.ForeignKey(User, blank=True,
+                               related_name='checkin_user',
+                               null=True)
 
     def __str__(self):
         return self.eventID.title + '<>' + self.hardwareID.serialNum

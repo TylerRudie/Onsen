@@ -3,6 +3,7 @@ from datetime import *
 from .models import *
 from django.contrib.contenttypes.admin import GenericTabularInline
 
+
 class assingmentInline(admin.TabularInline):
     model = assignment
     extra = 0
@@ -18,10 +19,6 @@ class abEvent(admin.TabularInline):
     extra = 0
     verbose_name = 'Assigned Airbill'
 
-# class hwEvent(admin.TabularInline):
-#     model = event.hwAssigned.through
-#     extra = 0
-#     verbose_name = 'Assigned Hardware'
 
 class HardwareAdmin(admin.ModelAdmin):
 
