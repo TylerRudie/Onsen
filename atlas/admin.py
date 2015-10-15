@@ -1,12 +1,12 @@
 from django.contrib import admin
 from datetime import *
 from .models import *
+from django.contrib.contenttypes.admin import GenericTabularInline
 
-
-class EventInline(admin.StackedInline):
-    model = event.hwAssigned.through
+class assingmentInline(admin.TabularInline):
+    model = assignment
     extra = 0
-
+    verbose_name = 'Assigments'
 
 class ctEventID(admin.TabularInline):
     model = event.ctAssigned.through
@@ -18,17 +18,22 @@ class abEvent(admin.TabularInline):
     extra = 0
     verbose_name = 'Assigned Airbill'
 
+# class hwEvent(admin.TabularInline):
+#     model = event.hwAssigned.through
+#     extra = 0
+#     verbose_name = 'Assigned Hardware'
 
 class HardwareAdmin(admin.ModelAdmin):
-    fields = ['serialNum','desc','config','status']
 
+    fields = ['serialNum','desc','config','poolID']
+    inlines = [assingmentInline,]
 
 
 class EventAdmin(admin.ModelAdmin):
     model = event
     #fields = ['name','status','startDate','endDate','hwAssigned' ]
 
-    inlines = [ctEventID, abEvent]
+    inlines = [ctEventID, assingmentInline, abEvent]
     list_display = ['title', 'start', 'end']
     ordering = ['start']
     list_filter = ['start']
@@ -38,5 +43,7 @@ admin.site.register(contact )
 admin.site.register(hardware, HardwareAdmin)
 admin.site.register(contact_event)
 admin.site.register(airbill)
+admin.site.register(case)
+admin.site.register(pool)
 admin.site.register(event_airbill)
 # Register your models here.

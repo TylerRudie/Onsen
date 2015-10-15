@@ -1,30 +1,10 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 import uuid
 
 
-
-
-class hardware(models.Model):
-    status_choices = (
-        ('a','Active'),
-        ('s','Standby'),
-        ('i','Inactive'),
-    )
-    hwId      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    serialNum = models.CharField(max_length=100)
-    desc      = models.CharField(max_length=100, blank=True)
-    config    = models.CharField(max_length=100, blank=True)
-    status    = models.CharField(max_length=100, choices = status_choices, default='Active' )
-
-
-
-    def __str__(self):
-        return self.serialNum
-
-
 class contact(models.Model):
-    ctId      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    ctID      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     firstName = models.CharField(max_length=100, blank=True)
     lastName  = models.CharField(max_length=100, blank=True)
     address1  = models.CharField(max_length=100, blank=True)
@@ -37,6 +17,39 @@ class contact(models.Model):
     company   = models.CharField(max_length=100, blank=True)
     def __str__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
+
+class pool(models.Model):
+
+    poolID   = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    poolName = models.CharField('Pool Name', blank=True, max_length=200)
+    Contact = models.ForeignKey(contact)
+
+    def __str__(self):
+        return  self.poolName
+
+
+class hardware(models.Model):
+    # status_choices = (
+    #     ('a','Active'),
+    #     ('s','Standby'),
+    #     ('i','Inactive'),
+    # )
+    hwId      = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    serialNum = models.CharField(max_length=100)
+    desc      = models.CharField(max_length=100, blank=True)
+    config    = models.CharField(max_length=100, blank=True)
+    type      = models.CharField(max_length=100, blank=True)
+    poolID    = models.ForeignKey(pool, blank=True, null=True)
+
+    def __str__(self):
+        return self.serialNum
+
+
+class case(models.Model):
+    caseID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    caseName = models.CharField('Case ID', blank=True, max_length=200)
+    def __str__(self):
+        return self.caseName
 
 
 class airbill(models.Model):
@@ -52,21 +65,26 @@ class event(models.Model):
     status_choices = (
         ('e','Event'),
         ('i','Inactive'),
-        ('p','Pool'),
+        # ('p','Pool'),
     )
 
-    evId =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    evID =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField('Title', blank=True, max_length=200)
     start = models.DateTimeField('Start')
     end   = models.DateTimeField('End')
     all_day = models.BooleanField('All day', default=False)
+    laptopsRequested = models.IntegerField(blank=True, null=True)
+    projectorRequested = models.BooleanField(default=False)
+    dateShipped = models.DateField('Date Shipped', blank=True, null=True)
 
     status = models.CharField(max_length=100,
                               choices=status_choices,
                               default='Event')
     hwAssigned = models.ManyToManyField(hardware,
                                         blank=True,
-                                        verbose_name='Assigned Hardware')
+                                        through='assignment',
+                                        verbose_name='Assigned Hardware',
+                                        related_name='events')
     ctAssigned = models.ManyToManyField(contact,
                                         through='contact_event',
                                         blank=True,
@@ -75,6 +93,13 @@ class event(models.Model):
                                         through='event_airbill',
                                         blank=True,
                                         verbose_name='Assigned Airbills')
+
+    caseAssigned = models.ManyToManyField(case, blank=True, null=True)
+
+    site = models.CharField(max_length=200, blank=True)
+
+    nextEvent = models.ForeignKey("self",  blank=True, null=True, verbose_name='Next Event')
+
 
     class Meta:
         verbose_name = 'Event'
@@ -93,10 +118,13 @@ class event(models.Model):
 
 
 
+
+
+
 class contact_event(models.Model):
 
-    ctId       = models.ForeignKey(contact)
-    evId       = models.ForeignKey(event)
+    ctID       = models.ForeignKey(contact)
+    evID       = models.ForeignKey(event)
     isShipping = models.BooleanField(default=False)
     isInst     = models.BooleanField(default=False)
 
@@ -110,7 +138,7 @@ class contact_event(models.Model):
 
 class event_airbill(models.Model):
 
-    evId = models.ForeignKey(event)
+    evID = models.ForeignKey(event)
     tracking = models.ForeignKey(airbill)
     toEvent  = models.BooleanField(default=False)
 
@@ -119,3 +147,15 @@ class event_airbill(models.Model):
 
     class meta:
         verbose_name = 'Assigned Airbill'
+
+
+class assignment(models.Model):
+    eventID = models.ForeignKey(event)
+    hardwareID = models.ForeignKey(hardware)
+    outTimeStamp = models.DateTimeField('Outbound Timestamp', blank=True)
+    outUser = models.ForeignKey(User, blank=True, related_name='checkout_user')
+    inTimeStamp = models.DateTimeField('Inbound Timestamp', blank=True)
+    inUser = models.ForeignKey(User, blank=True, related_name='checkin_user')
+
+    def __str__(self):
+        return self.eventID.title + '<>' + self.hardwareID.serialNum
