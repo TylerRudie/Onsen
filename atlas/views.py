@@ -2,12 +2,21 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
 import models
-
+## TODO - Update window.open to use URL reverse introspection (Do not hard code)
 OPTIONS = """{  timeFormat: "H:mm",
+                    customButtons: {
+                        NewEvent: {
+                            text: 'New',
+                            click: function() {
+                                window.open('/events/new/');
+                                return false;
+                            }
+                        }
+                    },
                 header: {
-                    left: 'prev,next today',
+                    left: 'prev,next today NewEvent',
                     center: 'title',
-                    right: 'month,basicWeek,basicDay',
+                    right: 'month, basicWeek, basicDay',
                 },
                 allDaySlot: true,
                 firstDay: 0,

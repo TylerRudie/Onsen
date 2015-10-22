@@ -34,7 +34,7 @@ class EventAdmin(admin.ModelAdmin):
 
     inlines = [ctEventID,  abEvent]
     list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
-    readonly_fields=['Transition_To_Event', 'Transition_from_event']
+    readonly_fields=['Transition_To_Event', 'Transition_from_event', 'url']
     ordering = ['start']
     list_filter = ['start']
     # filter_horizontal = ['hwAssigned',]

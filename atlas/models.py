@@ -189,7 +189,13 @@ class event(models.Model):
             return self.end + timedelta(days=settings.TRANS_DAYS)
         else:
             return None
-        Transition_from_event.short_description = 'Transition from Event'
+    Transition_from_event.short_description = 'Transition from Event'
+
+    @property
+    def url(self):
+
+        return '/events/edit/' +  str(self.evID)
+
 
     # TranToEvent = property(_getTranToEvent)
     # TranFromEvent = property(_getTranFromEvent)
