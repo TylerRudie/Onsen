@@ -34,12 +34,21 @@ OPTIONS = """{  timeFormat: "H:mm",
                 },
             }"""
 
-def calandar(request):
+def calendar(request):
     event_url = 'all_events/'
-    return render(request, 'calandar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
+    return render(request, 'calendar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
 # Create your views here.
 
+
 def home(request):
+    return render(request, "home.html", {})
+
+
+def new_event(request):
+    return render(request, "home.html", {})
+
+
+def edit_event(request, evID):
     return render(request, "home.html", {})
 
 

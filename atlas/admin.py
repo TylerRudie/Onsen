@@ -6,6 +6,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 
 class assingmentInline(admin.TabularInline):
     model = assignment
+    # readonly_fields= ['eventID_start', ]
     extra = 0
     verbose_name = 'Assigments'
 
@@ -23,17 +24,20 @@ class abEvent(admin.TabularInline):
 class HardwareAdmin(admin.ModelAdmin):
 
     fields = ['serialNum','desc','config','poolID']
+
     inlines = [assingmentInline,]
 
 
 class EventAdmin(admin.ModelAdmin):
     model = event
-    #fields = ['name','status','startDate','endDate','hwAssigned' ]
+    # fields= ('title', 'start', 'end', 'all_day', 'TranToEvent' )
 
-    inlines = [ctEventID, assingmentInline, abEvent]
-    list_display = ['title', 'start', 'end']
+    inlines = [ctEventID,  abEvent]
+    list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
+    readonly_fields=['Transition_To_Event', 'Transition_from_event']
     ordering = ['start']
     list_filter = ['start']
+    # filter_horizontal = ['hwAssigned',]
 
 admin.site.register(event, EventAdmin)
 admin.site.register(contact )

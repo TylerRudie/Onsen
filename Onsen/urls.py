@@ -21,9 +21,23 @@ from django.conf import settings
 urlpatterns = [
     url(r'^$', 'atlas.views.home', name='home'),
 
-    url(r'^events/calandar/all_events/', 'atlas.views.all_events', name='all_events'),
-    url(r'^events/calandar/$', 'atlas.views.calandar', name='calandar'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^events/calendar/all_events/',
+        'atlas.views.all_events',
+        name='all_events'),
+
+    url(r'^events/calendar/$',
+        'atlas.views.calendar',
+        name='calendar'),
+
+    url(r'^events/new/$',
+        'atlas.views.new_event',
+        name='event_new'),
+
+    url(r'^events/edit/(?P<evID>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$',
+        'atlas.views.edit_event',
+        name='event_edit'),
+    url(r'^admin/',
+        include(admin.site.urls)),
 
 ]
 
