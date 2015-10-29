@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     ## Third Party
     'crispy_forms',
+    'datetimewidget',
     ## Project
     'fullcalendar',
     'atlas',
@@ -53,6 +54,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
+    'django.middleware.locale.LocaleMiddleware',
 )
 
 ROOT_URLCONF = 'Onsen.urls'
@@ -109,6 +112,8 @@ USE_L10N = True
 USE_TZ = True
 
 TRANS_DAYS = 4
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 # Static files (CSS, JavaScript, Images)

@@ -33,7 +33,7 @@ urlpatterns = [
         'atlas.views.new_event',
         name='event_new'),
 
-    url(r'^events/edit/(?P<evID>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$',
+    url(r'^events/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$',
         'atlas.views.edit_event',
         name='event_edit'),
     url(r'^admin/',
