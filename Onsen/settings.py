@@ -114,7 +114,7 @@ USE_TZ = True
 TRANS_DAYS = 4
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
-
+CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
