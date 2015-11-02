@@ -36,6 +36,17 @@ urlpatterns = [
     url(r'^events/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$',
         'atlas.views.edit_event',
         name='event_edit'),
+
+    url(r'^hardware/new/$',
+        'atlas.views.new_hardware',
+        name='hardware_new'),
+
+    url(r'^hardware/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$',
+        'atlas.views.edit_hardware',
+        name='hardware_edit'),
+
+    url(r'^accounts/', include('registration.backends.default.urls')),
+
     url(r'^admin/',
         include(admin.site.urls)),
 

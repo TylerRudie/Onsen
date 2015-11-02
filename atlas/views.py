@@ -1,8 +1,11 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
-from .forms import eventForm
-from .models import event
+from .forms import eventForm, hardwareForm
+from .models import event, hardware
+
+
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code)
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
@@ -44,16 +47,27 @@ OPTIONS = """{  timeFormat: "H:mm",
                 },
             }"""
 
+@login_required
+def home(request):
+    return render(request, "home.html", {})
+
+
+@login_required
 def calendar(request):
     event_url = 'all_events/'
     return render(request, 'events/calendar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
 # Create your views here.
 
 
-def home(request):
-    return render(request, "home.html", {})
+@login_required
+def all_events(request):
+    events = event.objects.all()
+    return HttpResponse(events_to_json(events), content_type='application/json')
 
 
+##TODO add ability to delete events
+
+@login_required
 def new_event(request):
     title = 'New Event'
     form = eventForm(request.POST or None)
@@ -71,6 +85,7 @@ def new_event(request):
     return render(request, "events\event.html", context)
 
 
+@login_required
 def edit_event(request, uuid=None):
     title = 'Edit Event'
     if uuid:
@@ -95,6 +110,45 @@ def edit_event(request, uuid=None):
 
     return render(request, "events\event.html", context)
 
-def all_events(request):
-    events = event.objects.all()
-    return HttpResponse(events_to_json(events), content_type='application/json')
+
+@login_required
+def new_hardware(request):
+    title = 'New Hardware'
+    form = hardwareForm(request.POST or None)
+
+    if request.POST:
+            form = hardwareForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "hardware\hardware.html", context)
+
+
+@login_required
+def edit_hardware(request, uuid=None):
+    title = 'Edit Hardware'
+    if uuid:
+        thisObj = get_object_or_404(hardware, hwId=uuid)
+
+    if request.POST:
+        form = hardwareForm(request.POST, instance=thisObj)
+        if form.is_valid():
+            form.save()
+
+    else:
+        form = hardwareForm(instance=thisObj)
+
+    print thisObj
+
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "hardware\hardware.html", context)
