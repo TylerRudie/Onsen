@@ -1,5 +1,5 @@
 from django import forms
-from .models import event, hardware
+from .models import event, hardware, contact, airbill, pool
 from django.forms.widgets import SplitDateTimeWidget
 from bootstrap3_datetime.widgets import DateTimePicker
 from crispy_forms.helper import FormHelper
@@ -32,3 +32,20 @@ class hardwareForm(forms.ModelForm):
     class Meta:
         model = hardware
         exclude = ['hwID', ]
+
+
+class contactForm(forms.ModelForm):
+    class Meta:
+        model = contact
+        exclude = ['cdID', ]
+
+
+class airbillForm(forms.ModelForm):
+    class Meta:
+        model = airbill
+        exclude = ['abID', ]
+
+class poolForm(forms.ModelForm):
+    class Meta:
+        model = pool
+        exclude = ['poolID', ]

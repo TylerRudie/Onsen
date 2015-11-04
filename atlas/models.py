@@ -84,8 +84,13 @@ class case(models.Model):
 
 
 class airbill(models.Model):
+
+    abID      = models.UUIDField(primary_key=True,
+                                default=uuid.uuid4,
+                                editable=False)
+
     tracking   = models.CharField(max_length=100,
-                                  primary_key=True)
+                                  )
 
     lastStatus = models.CharField (max_length=100,
                                    blank=True)
@@ -194,7 +199,7 @@ class event(models.Model):
     @property
     def url(self):
 
-        return '/events/edit/' +  str(self.evID)
+        return '/events/edit/' +  str(self.evID) + '/'
 
 
     # TranToEvent = property(_getTranToEvent)

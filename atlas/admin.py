@@ -32,11 +32,12 @@ class EventAdmin(admin.ModelAdmin):
     model = event
     # fields= ('title', 'start', 'end', 'all_day', 'TranToEvent' )
 
-    inlines = [ctEventID,  abEvent]
+    inlines = [ctEventID,  abEvent, assingmentInline]
     list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
     readonly_fields=['Transition_To_Event', 'Transition_from_event', 'url']
     ordering = ['start']
     list_filter = ['start']
+    search_fields = ['title']
     # filter_horizontal = ['hwAssigned',]
 
 admin.site.register(event, EventAdmin)

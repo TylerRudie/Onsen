@@ -2,8 +2,8 @@ from django.shortcuts import render, render_to_response, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
-from .forms import eventForm, hardwareForm
-from .models import event, hardware
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
+from .models import event, hardware, contact, airbill, pool
 
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code)
@@ -110,6 +110,7 @@ def edit_event(request, uuid=None):
 
     return render(request, "events\event.html", context)
 
+###############################
 
 @login_required
 def new_hardware(request):
@@ -152,3 +153,142 @@ def edit_hardware(request, uuid=None):
     }
 
     return render(request, "hardware\hardware.html", context)
+
+@login_required
+def list_hardware(request):
+
+    thisList = hardware.objects.all()
+
+
+#############################
+
+@login_required
+def new_contact(request):
+    title = 'New Contact'
+    form = contactForm(request.POST or None)
+
+    if request.POST:
+            form = contactForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "contact\contact.html", context)
+
+
+@login_required
+def edit_contact(request, uuid=None):
+    title = 'Edit Contact'
+    if uuid:
+        thisObj = get_object_or_404(contact, ctID=uuid)
+
+    if request.POST:
+        form = contactForm(request.POST, instance=thisObj)
+        if form.is_valid():
+            form.save()
+
+    else:
+        form = contactForm(instance=thisObj)
+
+    print thisObj
+
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "contact\contact.html", context)
+
+#############################
+
+@login_required
+def new_airbill(request):
+    title = 'New Airbill'
+    form = airbillForm(request.POST or None)
+
+    if request.POST:
+            form = airbillForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "airbill/airbill.html", context)
+
+
+@login_required
+def edit_airbill(request, uuid=None):
+    title = 'Edit Airbill'
+    if uuid:
+        thisObj = get_object_or_404(airbill, abID=uuid)
+
+    if request.POST:
+        form = airbillForm(request.POST, instance=thisObj)
+        if form.is_valid():
+            form.save()
+
+    else:
+        form = airbillForm(instance=thisObj)
+
+    print thisObj
+
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "airbill/airbill.html", context)
+
+###########################
+
+@login_required
+def new_pool(request):
+    title = 'New Pool'
+    form = poolForm(request.POST or None)
+
+    if request.POST:
+            form = poolForm(request.POST)
+            if form.is_valid():
+                form.save()
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "airbill/airbill.html", context)
+
+
+@login_required
+def edit_pool(request, uuid=None):
+    title = 'Edit Pool'
+    if uuid:
+        thisObj = get_object_or_404(pool, poolID=uuid)
+
+    if request.POST:
+        form = poolForm(request.POST, instance=thisObj)
+        if form.is_valid():
+            form.save()
+
+    else:
+        form = poolForm(instance=thisObj)
+
+    print thisObj
+
+
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "airbill/airbill.html", context)
+
