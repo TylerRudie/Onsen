@@ -1,10 +1,13 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
 from .models import event, hardware, contact, airbill, pool
-
+from django.views.generic.list import ListView
+from django.utils import timezone
+from django.utils.decorators import method_decorator
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code)
 OPTIONS = """{  timeFormat: "H:mm",
@@ -154,11 +157,20 @@ def edit_hardware(request, uuid=None):
 
     return render(request, "hardware\hardware.html", context)
 
-@login_required
-def list_hardware(request):
+# @login_required
+class list_hardware(ListView):
 
-    thisList = hardware.objects.all()
+    model = hardware
+    template_name = 'hardware/hwIndex.html.html'
+    context_object_name = 'objects'
 
+    def get_queryset(self):
+        objList = hardware.objects.all()
+        return objList
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(list_hardware, self).dispatch(*args, **kwargs)
 
 #############################
 

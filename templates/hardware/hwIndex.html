@@ -1,0 +1,35 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Hardware - {% endblock %}
+
+{% block style %}
+
+{% endblock %}
+{% block Calendar_Support %}
+
+{% endblock %}
+ {%  block content %}
+    <div id="content-container" class="container p-none">
+        <div id="al-container" class="side-p">
+            <div id="al-control">
+                <h3 class="ad-mh">List
+                    {# Add Account Link #}
+                </h3>
+                {# Account Search Form #}
+            </div>
+            {# List of Accounts #}
+            <ul id="al-group" class="strip-list">
+                {% for obj in objects %}
+                    <li class="al-item">
+                        <a href=""><h4 class="al-name">{{ obj.serialNumber }}</h4></a>
+                        <span class="al-created">created on </span>
+                    </li>
+                {% endfor %}
+            </ul>
+            {# Pagination Section #}
+        </div>
+    </div>
+
+ {% endblock %}

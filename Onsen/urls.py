@@ -17,6 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from atlas.views import *
 
 urlpatterns = [
     url(r'^$', 'atlas.views.home', name='home'),
@@ -51,6 +52,10 @@ urlpatterns = [
     url(r'^hardware/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
         'atlas.views.edit_hardware',
         name='hardware_edit'),
+
+    url(r'^hardware/list/$',
+        list_hardware,
+        name='hardware_list'),
 
 ###################
 

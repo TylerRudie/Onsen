@@ -4,11 +4,12 @@ from .models import *
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 
-class assingmentInline(admin.TabularInline):
+class assingmentInline(admin.StackedInline):
     model = assignment
     # readonly_fields= ['eventID_start', ]
     extra = 0
-    verbose_name = 'Assigments'
+    verbose_name = 'Assignments'
+
 
 class ctEventID(admin.TabularInline):
     model = event.ctAssigned.through
@@ -32,9 +33,10 @@ class EventAdmin(admin.ModelAdmin):
     model = event
     # fields= ('title', 'start', 'end', 'all_day', 'TranToEvent' )
 
-    inlines = [ctEventID,  abEvent, assingmentInline]
+    inlines = [ctEventID,  abEvent,]
     list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
     readonly_fields=['Transition_To_Event', 'Transition_from_event', 'url']
+    filter_horizontal = ('hwAssigned','caseAssigned')
     ordering = ['start']
     list_filter = ['start']
     search_fields = ['title']
