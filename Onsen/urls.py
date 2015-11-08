@@ -17,8 +17,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
-from wiki.urls import get_pattern as get_wiki_pattern
-from django_nyt.urls import get_pattern as get_nyt_pattern
+# from wiki.urls import get_pattern as get_wiki_pattern
+# from django_nyt.urls import get_pattern as get_nyt_pattern
 from atlas.views import *
 
 urlpatterns = [
@@ -113,9 +113,6 @@ urlpatterns = [
 ]
 
 
-
-
-)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

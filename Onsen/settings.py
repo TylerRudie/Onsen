@@ -41,6 +41,9 @@ INSTALLED_APPS = (
     'crispy_forms',
     'bootstrap3_datetime',
     'registration',
+    ###Wiki
+    'mptt',
+    'sekizai',
     # 'django_nyt',
     # 'wiki',
     ## Project
