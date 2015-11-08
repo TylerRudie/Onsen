@@ -5,20 +5,15 @@
 {% block head_title %}Calendar - {% endblock %}
 {### TODO move off CDN for fullcalandar#}
 {% block Calendar_Support %}
-
-{#    fullcalendar 1.6.4 support files #}
-        <script src="{% static 'js/jquery.min.js' %}"></script>
-{#        {% fullcalendar_css %}#}
-{#        {% fullcalendar_print_css %}#}
-{#        {% fullcalendar_jquery_ui %}#}
-{#        {% fullcalendar_javascript %}#}
-        <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.css' />
-        <link rel='stylesheet' media="print"  href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.print.css' />
-        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.4.0/fullcalendar.min.js"></script>
+    <!-- Calendar Support Files -->
+        <link rel='stylesheet' href='{% static "css/fullcalendar.css" %}' />
+        <link rel='stylesheet' media="print"  href="{% static 'css/fullcalendar.print.css' %}"/>
+        <script src="{% static 'js/moment.min.js' %}"></script>
+        <script src="{% static 'js/fullcalendar.min.js' %}"></script>
 
 
    {% calendar_init calendar_config_options %}
+    <!-- Calendar Support Files END-->
 {% endblock %}
 
  {%  block content %}

@@ -41,6 +41,8 @@ INSTALLED_APPS = (
     'crispy_forms',
     'bootstrap3_datetime',
     'registration',
+    # 'django_nyt',
+    # 'wiki',
     ## Project
     'fullcalendar',
     'atlas',
@@ -113,6 +115,8 @@ USE_L10N = True
 USE_TZ = True
 
 TRANS_DAYS = 4
+
+NUM_PER_PAGE = 2
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 CRISPY_FAIL_SILENTLY = not DEBUG

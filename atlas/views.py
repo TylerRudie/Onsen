@@ -1,15 +1,19 @@
-from django.shortcuts import render, render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404, redirect
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
-from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
-from .models import event, hardware, contact, airbill, pool
+from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
-## TODO - Update window.open to use URL reverse introspection (Do not hard code)
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
+from .models import event, hardware, contact, airbill, pool
+
+## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
                         NewEvent: {
@@ -42,13 +46,10 @@ OPTIONS = """{  timeFormat: "H:mm",
                         $('#calendar').fullCalendar('changeView', 'basicDay')
                     }
                 },
-                eventClick: function(event, jsEvent, view) {
-                    if (view.name == 'month') {
-                        $('#calendar').fullCalendar('gotoDate', event.start)
-                        $('#calendar').fullCalendar('changeView', 'basicDay')
-                    }
-                },
             }"""
+
+def home_redirect(request):
+    return redirect('/')
 
 @login_required
 def home(request):
@@ -161,16 +162,31 @@ def edit_hardware(request, uuid=None):
 class list_hardware(ListView):
 
     model = hardware
-    template_name = 'hardware/hwIndex.html.html'
-    context_object_name = 'objects'
+    template_name = 'hardware/hwIndex.html'
+    paginate_by = settings.NUM_PER_PAGE
 
-    def get_queryset(self):
-        objList = hardware.objects.all()
-        return objList
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(list_hardware, self).dispatch(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super(list_hardware, self).get_context_data(**kwargs)
+        obj_y = hardware.objects.all()
+
+        print obj_y.count()
+
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
 
 #############################
 
@@ -192,7 +208,7 @@ def new_contact(request):
     return render(request, "contact\contact.html", context)
 
 
-@login_required
+
 def edit_contact(request, uuid=None):
     title = 'Edit Contact'
     if uuid:
@@ -215,6 +231,34 @@ def edit_contact(request, uuid=None):
     }
 
     return render(request, "contact\contact.html", context)
+
+
+##TODO add title context to view
+
+class list_contact(ListView):
+
+    model = contact
+    template_name = 'contact/ctIndex.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_contact, self).get_context_data(**kwargs)
+        obj_y = contact.objects.all()
+        print obj_y.count()
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+        print obj_z.object_list
+        context['page_items'] = obj_z
+        return context
 
 #############################
 
@@ -260,6 +304,35 @@ def edit_airbill(request, uuid=None):
 
     return render(request, "airbill/airbill.html", context)
 
+
+
+class list_airbill(ListView):
+
+    model = airbill
+    template_name = 'airbill/abindex.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_airbill, self).get_context_data(**kwargs)
+        obj_y = airbill.objects.all()
+        print obj_y.count()
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
+
 ###########################
 
 @login_required
@@ -304,3 +377,30 @@ def edit_pool(request, uuid=None):
 
     return render(request, "airbill/airbill.html", context)
 
+
+class list_pool(ListView):
+
+    model = pool
+    template_name = 'pool/poolindex.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_pool, self).get_context_data(**kwargs)
+        obj_y = pool.objects.all()
+        print obj_y.count()
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context

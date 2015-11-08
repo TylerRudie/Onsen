@@ -11,25 +11,54 @@
 
 {% endblock %}
  {%  block content %}
-    <div id="content-container" class="container p-none">
-        <div id="al-container" class="side-p">
-            <div id="al-control">
-                <h3 class="ad-mh">List
-                    {# Add Account Link #}
-                </h3>
-                {# Account Search Form #}
-            </div>
-            {# List of Accounts #}
-            <ul id="al-group" class="strip-list">
-                {% for obj in objects %}
-                    <li class="al-item">
-                        <a href=""><h4 class="al-name">{{ obj.serialNumber }}</h4></a>
-                        <span class="al-created">created on </span>
-                    </li>
-                {% endfor %}
-            </ul>
-            {# Pagination Section #}
-        </div>
-    </div>
+     <div class="results" xmlns="http://www.w3.org/1999/html">
+            <p>
+                 <a role="button" href="{% url 'hardware_new' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span> Add hardware
+                </a>
+            </p>
+            <table id="page_item" class="table table-striped table-bordered">
+                <thead>
+                <th scope="col"> Serial Number </th>
+                <th scope="col"> Model </th>
+                <th scope="col"> Config </th>
+                </thead>
+                  {% for item in page_items %}
+                      <tr>
+                        <td> <a href="{% url 'hardware_edit' uuid=item.hwId%}">{{ item.serialNum }}</a>
+                        </td>
+                        <td>{{ item.desc }}</td>
+                        <td>{{ item.config }}</td>
+                      </tr>
+                  {% endfor %}
+            </table>
 
+
+                    <ul  class="pagination pagination-centered">
+                        {% if page_items.has_previous %}
+                            <li>
+                                <span><a href="?page={{ page_items.previous_page_number }}">Previous</a></span>
+                            </li>
+                        {% else %}
+                            <li >
+                                <span style="color: lightgrey">Previous</span>
+                            </li>
+                        {% endif %}
+                            <li class="">
+                                <span>Page {{ page_items.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                            </li>
+                        {% if page_items.has_next %}
+                            <li>
+                                <span><a href="?page={{ page_items.next_page_number }}">Next</a></span>
+                            </li>
+                        {% else %}
+                            <li >
+                                <span style="color: lightgrey">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+
+
+     </div>
  {% endblock %}

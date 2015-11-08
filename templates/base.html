@@ -9,12 +9,15 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="robots" content="NONE,NOARCHIVE">
     <link rel="icon" href="../../favicon.ico">
 
     <title>{% block head_title %}{% endblock %} Project Onsen</title>
 
 
 {% include 'head_css.html' %}
+
+{% include 'javascript.html' %}
 
 <style>
 {% block style %}{% endblock %}
@@ -34,7 +37,7 @@
      </div> <!-- /container -->
 
 
-{% include 'javascript.html' %}
+
 
   </body>
 

@@ -17,6 +17,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from wiki.urls import get_pattern as get_wiki_pattern
+from django_nyt.urls import get_pattern as get_nyt_pattern
 from atlas.views import *
 
 urlpatterns = [
@@ -54,7 +56,7 @@ urlpatterns = [
         name='hardware_edit'),
 
     url(r'^hardware/list/$',
-        list_hardware,
+        list_hardware.as_view(),
         name='hardware_list'),
 
 ###################
@@ -67,6 +69,10 @@ urlpatterns = [
         'atlas.views.edit_contact',
         name='contact_edit'),
 
+    url(r'^contact/list/$',
+        list_contact.as_view(),
+        name='contact_list'),
+
 ###################
 
     url(r'^airbill/new/$',
@@ -76,6 +82,10 @@ urlpatterns = [
     url(r'^airbill/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
         'atlas.views.edit_airbill',
         name='airbill_edit'),
+
+    url(r'^airbill/list/$',
+        list_airbill.as_view(),
+        name='airbill_list'),
 
 ###################
 
@@ -87,14 +97,25 @@ urlpatterns = [
         'atlas.views.edit_pool',
         name='pool_edit'),
 
+    url(r'^pool/list/$',
+        list_pool.as_view(),
+        name='pool_list'),
 ###################
+    url(r'^accounts/profile/$',  'atlas.views.home_redirect'),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
 
     url(r'^admin/',
         include(admin.site.urls)),
 
+    # (r'^notifications/', get_nyt_pattern()),
+    # (r'^wiki/$', get_wiki_pattern())
 ]
+
+
+
+
+)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
