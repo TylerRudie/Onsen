@@ -6,16 +6,16 @@
 	> pip install --upgrade pip
 
 3. Unpack project files into its own folder.
-4. Update enviroment with the required dependences with the command command:
+4. Update environment with the required dependencies with the command command:
 
 	>  pip install -r requirements.txt
 	
-5. Update the local_settings.py file with the local setings.
+5. Update the local_settings.py file with the local settings.
 6. Populate the Database, this will install the tables for the supporting apps.
 
 	> python manage.py migrate
 	
-7. Run the MakeMigrations command to anaylize the Database and generate required new tables:
+7. Run the MakeMigrations command to analyze the Database and generate required new tables:
 
 	> python manage.py makemigrations
 	
@@ -31,4 +31,4 @@
 
 	> python manage.py runserver
 	
-11. The project will now be available at http://127.0.0.1:8000/
+11. The project will now be available at (http://127.0.0.1:8000/)
