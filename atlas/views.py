@@ -188,6 +188,10 @@ class list_hardware(ListView):
         context['page_items'] = obj_z
         return context
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_hardware, self).dispatch(request, *args, **kwargs)
+
 #############################
 
 @login_required
@@ -208,7 +212,7 @@ def new_contact(request):
     return render(request, "contact\contact.html", context)
 
 
-
+@login_required
 def edit_contact(request, uuid=None):
     title = 'Edit Contact'
     if uuid:
@@ -245,7 +249,7 @@ class list_contact(ListView):
     def get_context_data(self, **kwargs):
         context = super(list_contact, self).get_context_data(**kwargs)
         obj_y = contact.objects.all()
-        print obj_y.count()
+        #print obj_y.count()
         paginator = Paginator(obj_y, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -256,12 +260,17 @@ class list_contact(ListView):
             obj_z = paginator.page(1)
         except EmptyPage:
             obj_z = paginator.page(paginator.num_pages)
-        print obj_z.object_list
+        #print obj_z.object_list
+
         context['page_items'] = obj_z
         return context
 
-#############################
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_contact, self).dispatch(request, *args, **kwargs)
 
+
+#############################
 @login_required
 def new_airbill(request):
     title = 'New Airbill'
@@ -309,14 +318,14 @@ def edit_airbill(request, uuid=None):
 class list_airbill(ListView):
 
     model = airbill
-    template_name = 'airbill/abindex.html'
+    template_name = 'airbill/abIndex.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
     def get_context_data(self, **kwargs):
         context = super(list_airbill, self).get_context_data(**kwargs)
         obj_y = airbill.objects.all()
-        print obj_y.count()
+        #print obj_y.count()
         paginator = Paginator(obj_y, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -328,10 +337,15 @@ class list_airbill(ListView):
         except EmptyPage:
             obj_z = paginator.page(paginator.num_pages)
 
-        print obj_z.object_list
+        #print obj_z.object_list
 
         context['page_items'] = obj_z
         return context
+
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_airbill, self).dispatch(request, *args, **kwargs)
 
 ###########################
 
@@ -381,14 +395,14 @@ def edit_pool(request, uuid=None):
 class list_pool(ListView):
 
     model = pool
-    template_name = 'pool/poolindex.html'
+    template_name = 'pool/poolIndex.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
     def get_context_data(self, **kwargs):
         context = super(list_pool, self).get_context_data(**kwargs)
         obj_y = pool.objects.all()
-        print obj_y.count()
+        #print obj_y.count()
         paginator = Paginator(obj_y, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -400,7 +414,11 @@ class list_pool(ListView):
         except EmptyPage:
             obj_z = paginator.page(paginator.num_pages)
 
-        print obj_z.object_list
+        #print obj_z.object_list
 
         context['page_items'] = obj_z
         return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_pool, self).dispatch(request, *args, **kwargs)
