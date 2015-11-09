@@ -1,0 +1,80 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Airbill - {% endblock %}
+
+{% block style %}
+
+{% endblock %}
+{% block Calendar_Support %}
+
+{% endblock %}
+ {%  block content %}
+     <div class="results">
+            <p>
+                 <a role="button" href="{% url 'airbill_new' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span> Add Airbill
+                </a>
+            </p>
+
+        <table id="page_item" class="table table-striped table-bordered">
+
+            <thead>
+                <th scope="col"> Tracking </th>
+                <th scope="col"> Last Status </th>
+                <th scope="col"> Used  </th>
+            </thead>
+                  {% for item in page_items %}
+                      <tr>
+                        <td> <a href="{% url 'contact_edit' uuid=item.abID %}">{{ item }}</a>
+                        </td>
+                        <td>{{ item.lastStatus }}</td>
+                        <td>{{ item.used  }}</td>
+                      </tr>
+                  {% endfor %}
+        </table>
+                    <ul class="pagination">
+                      <li>
+                        <button class="btn btn-default
+                          {% if page_items.has_previous %}
+                            name="page"
+                            value="{{ page_items.previous_page_number }}"
+                            type="submit"
+                          {% else %}
+                            disabled="disabled"
+                          {% endif %}>
+                          prev
+                        </button>
+                      </li>
+
+                      {% for page_number in page_items.page_range %}
+                        <li class="{% if page_number = page_items.number %}active{% endif %}">
+                          <button class="btn btn-default
+                            name="page"
+                            value="{{ page_number }}"
+                            type="submit"
+                            {% if page_number = page_items.number %}
+                              disabled="disabled"
+                            {% endif %}>
+                            {{ page_number }}
+                          </button>
+                        </li>
+                      {% endfor %}
+
+                      <li>
+                        <button class="btn btn-default
+                          {% if page_items.has_next %}
+                            name="page"
+                            value="{{ page_items.next_page_number }}"
+                            type="submit"
+                          {% else %}
+                            disabled="disabled"
+                          {% endif %}>
+                          next
+                        </button>
+                      </li>
+                    </ul>
+
+     </div>
+ {% endblock %}

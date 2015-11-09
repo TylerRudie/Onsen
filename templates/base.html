@@ -1,0 +1,45 @@
+{% load staticfiles %}
+{% load fullcalendar_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="robots" content="NONE,NOARCHIVE">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>{% block head_title %}{% endblock %} Project Onsen</title>
+
+
+{% include 'head_css.html' %}
+
+{% include 'javascript.html' %}
+
+<style>
+{% block style %}{% endblock %}
+</style>
+ {% block Calendar_Support %} {% endblock %}
+  </head>
+
+  <body>
+{% include 'navbar.html' %}
+
+    <div class="container">
+
+    {% block jumbotron_content %}{% endblock %}
+
+    {%  block content %}{% endblock %}
+    {% block main %}{% endblock %}
+     </div> <!-- /container -->
+
+
+
+
+  </body>
+
+
+</html>

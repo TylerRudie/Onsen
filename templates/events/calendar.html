@@ -1,0 +1,23 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load fullcalendar_tags %}
+
+{% block head_title %}Calendar - {% endblock %}
+{### TODO move off CDN for fullcalandar#}
+{% block Calendar_Support %}
+    <!-- Calendar Support Files -->
+        <link rel='stylesheet' href='{% static "css/fullcalendar.css" %}' />
+        <link rel='stylesheet' media="print"  href="{% static 'css/fullcalendar.print.css' %}"/>
+        <script src="{% static 'js/moment.min.js' %}"></script>
+        <script src="{% static 'js/fullcalendar.min.js' %}"></script>
+
+
+   {% calendar_init calendar_config_options %}
+    <!-- Calendar Support Files END-->
+{% endblock %}
+
+ {%  block content %}
+
+    {% calendar %}
+
+ {% endblock %}
