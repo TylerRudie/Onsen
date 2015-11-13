@@ -9,6 +9,7 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from easy_pdf.views import PDFTemplateView
 
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
 from .models import event, hardware, contact, airbill, pool
@@ -422,3 +423,7 @@ class list_pool(ListView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(list_pool, self).dispatch(request, *args, **kwargs)
+
+
+class HelloPDFView(PDFTemplateView):
+    template_name = "pdf/test_pdf.html"

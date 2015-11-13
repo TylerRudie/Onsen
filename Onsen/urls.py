@@ -108,6 +108,7 @@ urlpatterns = [
 
     # (r'^notifications/', get_nyt_pattern()),
     # (r'^wiki/$', get_wiki_pattern())
+    url(r'^pdf/$', HelloPDFView.as_view())
 ]
 
 
