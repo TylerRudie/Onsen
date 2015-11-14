@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import timedelta
+from django.core.validators import MinValueValidator
 import uuid
 
 
@@ -77,8 +78,13 @@ class hardware(models.Model):
 
 
 class case(models.Model):
-    caseID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    caseName = models.CharField('Case ID', blank=True, max_length=200)
+    caseID = models.UUIDField(primary_key=True,
+                              default=uuid.uuid4,
+                              editable=False)
+
+    caseName = models.CharField('Case ID',
+                                blank=True,
+                                max_length=200)
     def __unicode__(self):
         return self.caseName
 
@@ -100,13 +106,23 @@ class airbill(models.Model):
     def __unicode__(self):
         return self.tracking
 
+class configuration (models.Model):
+    cfgID =     models.UUIDField(primary_key=True,
+                                default=uuid.uuid4,
+                                editable=False)
+
+    cfg_name =  models.CharField('Title',
+                                blank=True,
+                                max_length=200)
+
+    days_Conf = models.IntegerField(blank=True,
+                                    validators=[MinValueValidator(0)],
+                                    null=True
+                                    )
+
+
 
 class event(models.Model):
-    status_choices = (
-        ('e','Event'),
-        ('i','Inactive'),
-        # ('p','Pool'),
-    )
 
     evID    =  models.UUIDField(primary_key=True,
                              default=uuid.uuid4,
@@ -124,7 +140,8 @@ class event(models.Model):
                                   default=False)
 
     laptopsRequested = models.IntegerField(blank=True,
-                                           null=True)
+                                            validators=[MinValueValidator(0)],
+                                            null=True)
 
     projectorRequested = models.BooleanField(default=False)
 
@@ -132,9 +149,7 @@ class event(models.Model):
                                    blank=True,
                                    null=True)
 
-    status = models.CharField(max_length=100,
-                              choices=status_choices,
-                              default='Event')
+    status = models.BooleanField(default=True)
 
     hwAssigned = models.ManyToManyField(hardware,
                                         blank=True,
@@ -154,6 +169,8 @@ class event(models.Model):
 
     caseAssigned = models.ManyToManyField(case, blank=True)
 
+    configAssigned = models.ManyToManyField(configuration, blank=True)
+
     site = models.CharField(max_length=200, blank=True)
 
     nextEvent = models.ForeignKey("self",
@@ -167,16 +184,8 @@ class event(models.Model):
                              null=True,
                              verbose_name='Pool')
 
-
-
-
-
     def __unicode__(self):
         return self.title
-
-
-    # def _getStartWeek(self):
-    #     return self.startDate.isocalendar()[1]
 
     def Transition_To_Event(self):
         if (self.prevEvent.count() > 0 ):
@@ -198,18 +207,13 @@ class event(models.Model):
 
     @property
     def url(self):
-
         return '/events/edit/' +  str(self.evID) + '/'
-
-
-    # TranToEvent = property(_getTranToEvent)
-    # TranFromEvent = property(_getTranFromEvent)
-    #
-    # startWeek = property(_getStartWeek)
 
     class Meta:
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
+
+
 
 
 class contact_event(models.Model):
@@ -240,17 +244,23 @@ class event_airbill(models.Model):
 
 
 class assignment(models.Model):
+
     eventID = models.ForeignKey(event)
+
     hardwareID = models.ForeignKey(hardware)
+
     outTimeStamp = models.DateTimeField('Outbound Timestamp',
                                         blank=True,
                                         null=True)
+
     outUser = models.ForeignKey(User, blank=True,
                                 related_name='checkout_user',
                                 null=True)
+
     inTimeStamp = models.DateTimeField('Inbound Timestamp',
                                        blank=True,
                                        null=True)
+
     inUser = models.ForeignKey(User, blank=True,
                                related_name='checkin_user',
                                null=True)

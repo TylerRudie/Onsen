@@ -37,7 +37,7 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [ctEventID,  abEvent,]
     list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
     readonly_fields=['Transition_To_Event', 'Transition_from_event', 'url']
-    filter_horizontal = ('hwAssigned','caseAssigned')
+    filter_horizontal = ('hwAssigned','caseAssigned', 'configAssigned')
     ordering = ['start']
     list_filter = ['start']
     search_fields = ['title']
@@ -51,4 +51,5 @@ admin.site.register(airbill)
 admin.site.register(case)
 admin.site.register(pool)
 admin.site.register(event_airbill)
+admin.site.register(configuration)
 # Register your models here.
