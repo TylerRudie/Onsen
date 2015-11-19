@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.core.validators import MinValueValidator
 import uuid
 
-
+###############################################
 class contact(models.Model):
     ctID      = models.UUIDField(primary_key=True,
                                  default=uuid.uuid4,
@@ -32,6 +32,7 @@ class contact(models.Model):
 
     def __unicode__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
+###############################################
 
 class pool(models.Model):
 
@@ -43,19 +44,19 @@ class pool(models.Model):
                                 blank=True,
                                 max_length=200)
 
-    Contact = models.ForeignKey(contact)
+    contact = models.ForeignKey(contact)
 
+    cost_center = models.IntegerField(blank=True,
+                                    validators=[MinValueValidator(0)],
+                                    null=True
+                                    )
     def __unicode__(self):
         return  self.poolName
-
+###############################################
 
 class hardware(models.Model):
-    # status_choices = (
-    #     ('a','Active'),
-    #     ('s','Standby'),
-    #     ('i','Inactive'),
-    # )
-    hwId      = models.UUIDField(primary_key=True,
+
+    hwID      = models.UUIDField(primary_key=True,
                                  default=uuid.uuid4,
                                  editable=False)
 
@@ -75,7 +76,7 @@ class hardware(models.Model):
 
     def __unicode__(self):
         return self.serialNum
-
+###############################################
 
 class case(models.Model):
     caseID = models.UUIDField(primary_key=True,
@@ -87,7 +88,7 @@ class case(models.Model):
                                 max_length=200)
     def __unicode__(self):
         return self.caseName
-
+###############################################
 
 class airbill(models.Model):
 
@@ -105,6 +106,7 @@ class airbill(models.Model):
 
     def __unicode__(self):
         return self.tracking
+###############################################
 
 class configuration (models.Model):
     cfgID =     models.UUIDField(primary_key=True,
@@ -119,8 +121,9 @@ class configuration (models.Model):
                                     validators=[MinValueValidator(0)],
                                     null=True
                                     )
-
-
+    def __unicode__(self):
+        return self.cfg_name
+###############################################
 
 class event(models.Model):
 
@@ -157,21 +160,30 @@ class event(models.Model):
                                         verbose_name='Assigned Hardware',
                                         related_name='events')
 
-    ctAssigned = models.ManyToManyField(contact,
-                                        through='contact_event',
-                                        blank=True,
-                                        verbose_name='Assigned Contacts')
+    shipping_contact = models.ForeignKey(contact,
+                                         blank = True,
+                                         null = True,
+                                         related_name='shippingCnt'
+                                        )
+
+    instructor_contact = models.ManyToManyField(contact,
+                                                blank = True,
+                                                related_name='instCnt'
+                                                )
 
     abAssigned = models.ManyToManyField(airbill,
                                         through='event_airbill',
                                         blank=True,
                                         verbose_name='Assigned Airbills')
 
-    caseAssigned = models.ManyToManyField(case, blank=True)
+    caseAssigned = models.ManyToManyField(case,
+                                          blank=True)
 
-    configAssigned = models.ManyToManyField(configuration, blank=True)
+    configAssigned = models.ManyToManyField(configuration,
+                                            blank=True)
 
-    site = models.CharField(max_length=200, blank=True)
+    site = models.CharField(max_length=200,
+                            blank=True)
 
     nextEvent = models.ForeignKey("self",
                                   blank=True,
@@ -187,14 +199,16 @@ class event(models.Model):
     def __unicode__(self):
         return self.title
 
-    def Transition_To_Event(self):
+
+    def Transition_to_event(self):
         if (self.prevEvent.count() > 0 ):
             return None
         elif (self.start):
             return self.start - timedelta(days=settings.TRANS_DAYS)
         else:
             return None
-        Tran_To_Event.verbose = ''
+        Tran_to_event.verbose = ''
+
 
     def Transition_from_event(self):
         if (self.nextEvent):
@@ -204,6 +218,8 @@ class event(models.Model):
         else:
             return None
     Transition_from_event.short_description = 'Transition from Event'
+
+
 
     @property
     def url(self):
@@ -215,20 +231,7 @@ class event(models.Model):
 
 
 
-
-class contact_event(models.Model):
-
-    ctID       = models.ForeignKey(contact)
-    evID       = models.ForeignKey(event)
-    isShipping = models.BooleanField(default=False)
-    isInst     = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.ctID.firstName + ' ' + self.ctID.lastName + '<>' + self.evID.title
-
-    class meta:
-        verbose_name = 'Assigned Contacts'
-
+###############################################
 
 class event_airbill(models.Model):
 

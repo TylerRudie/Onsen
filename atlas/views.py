@@ -56,7 +56,7 @@ def home_redirect(request):
 def home(request):
     return render(request, "home.html", {})
 
-
+###############################################
 @login_required
 def calendar(request):
     event_url = 'all_events/'
@@ -68,8 +68,6 @@ def calendar(request):
 def all_events(request):
     events = event.objects.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
-
-
 ##TODO add ability to delete events
 
 @login_required
@@ -110,12 +108,49 @@ def edit_event(request, uuid=None):
 
     context = {
         "title": title,
-        "form": form
+        "form": form,
+        "evID": thisEvent.evID
     }
 
-    return render(request, "events\event.html", context)
+    return render(request, "events/event.html", context)
 
-###############################
+
+class packing_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_packing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(packing_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        ev = get_object_or_404(event, evID=uuid)
+
+
+        context["event"] = ev
+        # context["contact"] =
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(packing_pdfView, self).dispatch(request, *args, **kwargs)
+
+
+class srf_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_srf.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(srf_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        print uuid
+        ev = get_object_or_404(event, evID=uuid)
+        print ev
+        context["event"] = ev
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
+
+
+###############################################
 
 @login_required
 def new_hardware(request):
@@ -132,7 +167,7 @@ def new_hardware(request):
         "form": form
     }
 
-    return render(request, "hardware\hardware.html", context)
+    return render(request, "hardware/hardware.html", context)
 
 
 @login_required
@@ -157,7 +192,7 @@ def edit_hardware(request, uuid=None):
         "form": form
     }
 
-    return render(request, "hardware\hardware.html", context)
+    return render(request, "hardware/hardware.html", context)
 
 # @login_required
 class list_hardware(ListView):
@@ -193,7 +228,7 @@ class list_hardware(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
 
-#############################
+###############################################
 
 @login_required
 def new_contact(request):
@@ -210,7 +245,7 @@ def new_contact(request):
         "form": form
     }
 
-    return render(request, "contact\contact.html", context)
+    return render(request, "contact/contact.html", context)
 
 
 @login_required
@@ -271,7 +306,7 @@ class list_contact(ListView):
         return super(list_contact, self).dispatch(request, *args, **kwargs)
 
 
-#############################
+###############################################
 @login_required
 def new_airbill(request):
     title = 'New Airbill'
@@ -315,7 +350,6 @@ def edit_airbill(request, uuid=None):
     return render(request, "airbill/airbill.html", context)
 
 
-
 class list_airbill(ListView):
 
     model = airbill
@@ -348,7 +382,7 @@ class list_airbill(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(list_airbill, self).dispatch(request, *args, **kwargs)
 
-###########################
+###############################################
 
 @login_required
 def new_pool(request):
@@ -425,5 +459,11 @@ class list_pool(ListView):
         return super(list_pool, self).dispatch(request, *args, **kwargs)
 
 
+###############################################
+##TODO Remove Example view and Templates
+
 class HelloPDFView(PDFTemplateView):
-    template_name = "pdf/test_pdf.html"
+    template_name = "pdf/hello.html"
+
+    def get_context_data(self, **kwargs):
+        self.evID = self.kwargs['evid']

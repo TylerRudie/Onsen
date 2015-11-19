@@ -11,10 +11,7 @@ class assingmentInline(admin.StackedInline):
     verbose_name = 'Assignments'
 
 
-class ctEventID(admin.TabularInline):
-    model = event.ctAssigned.through
-    extra = 0
-    verbose_name = 'Assigned Contact'
+
 
 class abEvent(admin.TabularInline):
     model = event.abAssigned.through
@@ -34,10 +31,10 @@ class EventAdmin(admin.ModelAdmin):
     model = event
     # fields= ('title', 'start', 'end', 'all_day', 'TranToEvent' )
 
-    inlines = [ctEventID,  abEvent,]
-    list_display = ['title', 'start', 'end',  'Transition_To_Event', 'Transition_from_event']
-    readonly_fields=['Transition_To_Event', 'Transition_from_event', 'url']
-    filter_horizontal = ('hwAssigned','caseAssigned', 'configAssigned')
+    inlines = [ assingmentInline ]
+    list_display = ['title', 'start', 'end',  'Transition_to_event', 'Transition_from_event']
+    readonly_fields=['Transition_to_event', 'Transition_from_event', 'url']
+    filter_vertical = ('caseAssigned', 'configAssigned','instructor_contact')
     ordering = ['start']
     list_filter = ['start']
     search_fields = ['title']
@@ -46,7 +43,7 @@ class EventAdmin(admin.ModelAdmin):
 admin.site.register(event, EventAdmin)
 admin.site.register(contact )
 admin.site.register(hardware, HardwareAdmin)
-admin.site.register(contact_event)
+
 admin.site.register(airbill)
 admin.site.register(case)
 admin.site.register(pool)
