@@ -49,6 +49,10 @@ urlpatterns = [
         srf_pdfView.as_view(),
         name='event_srf_pdf'),
 
+    url(r'^events/checkin/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        checkin_hardware.as_view(),
+        name='event_checkin'),
+
 ###################
 
     url(r'^hardware/new/$',

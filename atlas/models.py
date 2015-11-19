@@ -248,6 +248,10 @@ class event_airbill(models.Model):
 
 class assignment(models.Model):
 
+    asgID = models.UUIDField(primary_key=True,
+                                default=uuid.uuid4,
+                                editable=False)
+
     eventID = models.ForeignKey(event)
 
     hardwareID = models.ForeignKey(hardware)

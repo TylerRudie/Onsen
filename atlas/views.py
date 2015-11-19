@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
-from .models import event, hardware, contact, airbill, pool
+from .models import event, hardware, contact, airbill, pool, assignment
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
@@ -150,6 +150,42 @@ class srf_pdfView(PDFTemplateView):
         return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
 
 
+class checkin_hardware(ListView):
+    model = assignment
+    template_name = 'events/checkin_hardware.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(checkin_hardware, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        obj_y = assignment.objects.filter(eventID=uuid)
+
+        print obj_y.count()
+
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+
+
+
+
 ###############################################
 
 @login_required
@@ -174,7 +210,7 @@ def new_hardware(request):
 def edit_hardware(request, uuid=None):
     title = 'Edit Hardware'
     if uuid:
-        thisObj = get_object_or_404(hardware, hwId=uuid)
+        thisObj = get_object_or_404(hardware, hwID=uuid)
 
     if request.POST:
         form = hardwareForm(request.POST, instance=thisObj)
@@ -270,7 +306,7 @@ def edit_contact(request, uuid=None):
         "form": form
     }
 
-    return render(request, "contact\contact.html", context)
+    return render(request, "contact/contact.html", context)
 
 
 ##TODO add title context to view

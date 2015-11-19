@@ -1,0 +1,64 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Hardware - {% endblock %}
+
+{% block style %}
+
+{% endblock %}
+{% block Calendar_Support %}
+
+{% endblock %}
+ {%  block content %}
+     <div class="results" xmlns="http://www.w3.org/1999/html">
+            <p>
+
+            </p>
+            <table id="page_item" class="table table-striped table-bordered">
+                <thead>
+                <th scope="col"> Serial Number </th>
+                <th scope="col"> Model </th>
+                <th scope="col"> Config </th>
+                <th scope="col"> Action </th>
+                </thead>
+                  {% for item in page_items %}
+                      <tr>
+                        <td> <a href="{% url 'hardware_edit' uuid=item.hardwareID.hwID %}">{{ item.hardwareID.serialNum }}</a>
+                        </td>
+                        <td>{{ item.hardwareID.desc }}</td>
+                        <td>{{ item.hardwareID.config }}</td>
+                        <td>..checkin..</td>
+                      </tr>
+                  {% endfor %}
+            </table>
+
+
+                    <ul  class="pagination pagination-centered">
+                        {% if page_items.has_previous %}
+                            <li>
+                                <span><a href="?page={{ page_items.previous_page_number }}">Previous</a></span>
+                            </li>
+                        {% else %}
+                            <li >
+                                <span style="color: lightgrey">Previous</span>
+                            </li>
+                        {% endif %}
+                            <li class="">
+                                <span>Page {{ page_items.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                            </li>
+                        {% if page_items.has_next %}
+                            <li>
+                                <span><a href="?page={{ page_items.next_page_number }}">Next</a></span>
+                            </li>
+                        {% else %}
+                            <li >
+                                <span style="color: lightgrey">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+
+
+     </div>
+ {% endblock %}
