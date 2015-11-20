@@ -22,13 +22,15 @@
                 <th scope="col"> Serial Number </th>
                 <th scope="col"> Model </th>
                 <th scope="col"> Config </th>
+                <th scope="col"> Status </th>
                 </thead>
                   {% for item in page_items %}
                       <tr>
-                        <td> <a href="{% url 'hardware_edit' uuid=item.hwId%}">{{ item.serialNum }}</a>
+                        <td> <a href="{% url 'hardware_edit' uuid=item.hwID%}">{{ item.serialNum }}</a>
                         </td>
                         <td>{{ item.desc }}</td>
                         <td>{{ item.config }}</td>
+                        <td>{{ item.status }}</td>
                       </tr>
                   {% endfor %}
             </table>

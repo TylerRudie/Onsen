@@ -4,7 +4,7 @@
     <style type="text/css" xmlns="http://www.w3.org/1999/html">
         @page {
             size: {{ pagesize|default:"Letter" }};
-            margin-left: 5.5cm;
+            margin-left: 2cm;
             margin-right: 2.5cm;
             margin-top: 2.5cm;
             margin-bottom: 2cm;
@@ -68,6 +68,8 @@
         {% endfor %}
         <hr>
         {{ event.url }}
+        <hr>
+        {{ event.pool.cost_center }}
 
     </p>
     </div>

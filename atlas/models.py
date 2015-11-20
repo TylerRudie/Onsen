@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import timedelta
+from django.utils import timezone
 from django.core.validators import MinValueValidator
 import uuid
 
@@ -76,6 +77,35 @@ class hardware(models.Model):
 
     def __unicode__(self):
         return self.serialNum
+
+    def status(self):
+
+        if (assignment.objects.filter(hardwareID=self.hwID,
+                                      outUser__isnull=True).count() > 0):
+            return 'Setup'
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__start__gt= timezone.now() ).count() > 0):
+            return 'TransferTo'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__start__lte= timezone.now(),
+                                        eventID__end__gt= timezone.now() ).count() > 0):
+            return 'AtEvent'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__end__lte= timezone.now() ).count() > 0):
+            return 'TransferFrom'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__end__lte= timezone.now() ).count() > 0):
+            return 'TransferFrom'
+
+        else:
+            return 'Available'
 ###############################################
 
 class case(models.Model):
