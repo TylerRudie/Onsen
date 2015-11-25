@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+
 from django.conf import settings
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
@@ -10,6 +10,11 @@ from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
+
+import datatableview
+
+from datatableview.views import DatatableView, XEditableDatatableView
+from datatableview import helpers
 
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
 from .models import event, hardware, contact, airbill, pool, assignment
@@ -156,6 +161,7 @@ class checkin_hardware(ListView):
     paginate_by = settings.NUM_PER_PAGE
 
 
+
     def get_context_data(self, **kwargs):
         context = super(checkin_hardware, self).get_context_data(**kwargs)
         uuid = self.kwargs['uuid']
@@ -174,14 +180,23 @@ class checkin_hardware(ListView):
         except EmptyPage:
             obj_z = paginator.page(paginator.num_pages)
 
-        print obj_z.object_list
+        # print obj_z.object_list
 
         context['page_items'] = obj_z
         return context
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+
+        if request.POST:
+            for item in request.POST.getlist('selected_hardware'):
+                print(item)
+                print(request.user)
+                print(timezone.now())
+
+            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
 
 
 
@@ -263,6 +278,18 @@ class list_hardware(ListView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
+
+
+class hardwareDatatableView(DatatableView):
+    model = hardware
+    datatable_options = {
+        'structure_template': "datatableview/bootstrap_structure.html",
+        'columns': [
+            'serialNum',
+            'desc',
+            'config',
+        ]
+    }
 
 ###############################################
 

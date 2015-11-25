@@ -20,21 +20,19 @@
 {% include 'javascript.html' %}
 
 <style>
-{% block style %}{% endblock %}
+        {% block style %}{% endblock %}
 </style>
- {% block Calendar_Support %} {% endblock %}
-  </head>
+        {% block Calendar_Support %}{% endblock %}
+</head>
 
   <body>
-{% include 'navbar.html' %}
+        {% include 'navbar.html' %}
 
-    <div class="container">
-
-    {% block jumbotron_content %}{% endblock %}
-
-    {%  block content %}{% endblock %}
-    {% block main %}{% endblock %}
-     </div> <!-- /container -->
+        <div class="container">
+            {% block jumbotron_content %}{% endblock %}
+            {% block content %}{% endblock %}
+            {% block main %}{% endblock %}
+        </div> <!-- /container -->
 
 
 

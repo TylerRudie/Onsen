@@ -81,28 +81,31 @@ class hardware(models.Model):
     def status(self):
 
         if (assignment.objects.filter(hardwareID=self.hwID,
-                                      outUser__isnull=True).count() > 0):
+                                      outUser__isnull=True,
+                                      inUser__isnull=True
+                                      ).count() > 0):
             return 'Setup'
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
-                                        eventID__start__gt= timezone.now() ).count() > 0):
-            return 'TransferTo'
+                                        inUser__isnull=True,
+                                        eventID__start__gt= timezone.now()
+                                        ).count() > 0):
+            return 'Transfer To'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
+                                        inUser__isnull=True,
                                         eventID__start__lte= timezone.now(),
-                                        eventID__end__gt= timezone.now() ).count() > 0):
-            return 'AtEvent'
+                                        eventID__end__gt= timezone.now()
+                                        ).count() > 0):
+            return 'At Event'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
-                                        eventID__end__lte= timezone.now() ).count() > 0):
-            return 'TransferFrom'
-
-        elif (assignment.objects.filter(hardwareID=self.hwID,
-                                        outUser__isnull=False,
-                                        eventID__end__lte= timezone.now() ).count() > 0):
-            return 'TransferFrom'
+                                        inUser__isnull=True,
+                                        eventID__end__lte= timezone.now(),
+                                        ).count() > 0):
+            return 'Transfer From'
 
         else:
             return 'Available'
@@ -240,14 +243,14 @@ class event(models.Model):
         Tran_to_event.verbose = ''
 
 
-    def Transition_from_event(self):
+    def transitionFrom(self):
         if (self.nextEvent):
             return None
         elif (self.end):
             return self.end + timedelta(days=settings.TRANS_DAYS)
         else:
             return None
-    Transition_from_event.short_description = 'Transition from Event'
+    transitionFrom.short_description = 'Transition from Event'
 
 
 

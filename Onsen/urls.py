@@ -67,6 +67,11 @@ urlpatterns = [
         list_hardware.as_view(),
         name='hardware_list'),
 
+    url(r'^hardware/list2/$',
+        hardwareDatatableView.as_view(),
+        name='hardware_list2'),
+
+
 ###################
 
     url(r'^contact/new/$',
