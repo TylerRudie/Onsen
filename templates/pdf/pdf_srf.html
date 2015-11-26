@@ -1,0 +1,51 @@
+{% extends "pdf/pdf_base.html" %}
+
+{% block layout_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+        @page {
+            size: {{ pagesize|default:"Letter" }};
+            margin-left: 5.5cm;
+            margin-right: 2.5cm;
+            margin-top: 2.5cm;
+            margin-bottom: 2cm;
+                @frame header {
+                    -pdf-frame-content: page-header;
+                    margin-top: 1.3cm;
+                    margin-right: 2mm;
+                    margin-bottom: 1cm;
+                    margin-left: 1.2cm;
+                    }
+            }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+
+{% endblock %}
+
+{%block page_header%}
+
+{% endblock %}
+
+{% block content %}
+    <div id="content">
+    <p> {{ event.title }} </br>
+        {{ event.start }} </br>
+        {{ event.end }} </br>
+        {{ event.all_day }} </br>
+        {{ event.laptopsRequested }} </br>
+        {{ event.projectorRequested }} </br>
+        {{ event.dateShipped }} </br>
+        {{ event.hwAssigned }} </br>
+        {{ event.ctAssigned }} </br>
+        {{ event.abAssigned }} </br>
+        {{ event.caseAssigned }} </br>
+        {{ event.configAssigned }} </br>
+        {{ event.site }} </br>
+        {{ event.nextEvent }} </br>
+        {{ event.Transition_To_Event }} </br>
+        {{ event.Transition_from_event }} </br>
+
+    </p>
+    </div>
+{% endblock %}

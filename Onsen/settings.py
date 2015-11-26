@@ -41,7 +41,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'bootstrap3_datetime',
     'registration',
-
+    'easy_pdf',
 
     ## Project
     'fullcalendar',

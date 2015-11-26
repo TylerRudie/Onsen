@@ -1,5 +1,4 @@
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -9,9 +8,11 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from easy_pdf.views import PDFTemplateView
 
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
-from .models import event, hardware, contact, airbill, pool
+from .models import event, hardware, contact, airbill, pool, assignment
+from django_datatables_view.base_datatable_view import BaseDatatableView
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
@@ -55,11 +56,18 @@ def home_redirect(request):
 def home(request):
     return render(request, "home.html", {})
 
+###############################################
 
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html", {})
+
+
+###############################################
 @login_required
 def calendar(request):
     event_url = 'all_events/'
-    return render(request, 'events/calendar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
+    return render(request, 'events/cl.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
 # Create your views here.
 
 
@@ -67,8 +75,6 @@ def calendar(request):
 def all_events(request):
     events = event.objects.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
-
-
 ##TODO add ability to delete events
 
 @login_required
@@ -109,12 +115,95 @@ def edit_event(request, uuid=None):
 
     context = {
         "title": title,
-        "form": form
+        "form": form,
+        "evID": thisEvent.evID
     }
 
-    return render(request, "events\event.html", context)
+    return render(request, "events/event.html", context)
 
-###############################
+
+class packing_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_packing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(packing_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        ev = get_object_or_404(event, evID=uuid)
+
+
+        context["event"] = ev
+        # context["contact"] =
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(packing_pdfView, self).dispatch(request, *args, **kwargs)
+
+
+class srf_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_srf.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(srf_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        print uuid
+        ev = get_object_or_404(event, evID=uuid)
+        print ev
+        context["event"] = ev
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
+
+
+class checkin_hardware(ListView):
+    model = assignment
+    template_name = 'events/checkin_hardware.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+
+    def get_context_data(self, **kwargs):
+        context = super(checkin_hardware, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        obj_y = assignment.objects.filter(eventID=uuid)
+
+        print obj_y.count()
+
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        # print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.POST:
+            for item in request.POST.getlist('selected_hardware'):
+                print(item)
+                print(request.user)
+                print(timezone.now())
+
+            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+
+
+
+
+###############################################
 
 @login_required
 def new_hardware(request):
@@ -131,14 +220,13 @@ def new_hardware(request):
         "form": form
     }
 
-    return render(request, "hardware\hardware.html", context)
-
+    return render(request, "hardware/hardware.html", context)
 
 @login_required
 def edit_hardware(request, uuid=None):
     title = 'Edit Hardware'
     if uuid:
-        thisObj = get_object_or_404(hardware, hwId=uuid)
+        thisObj = get_object_or_404(hardware, hwID=uuid)
 
     if request.POST:
         form = hardwareForm(request.POST, instance=thisObj)
@@ -156,13 +244,13 @@ def edit_hardware(request, uuid=None):
         "form": form
     }
 
-    return render(request, "hardware\hardware.html", context)
+    return render(request, "hardware/hardware.html", context)
 
 # @login_required
 class list_hardware(ListView):
 
     model = hardware
-    template_name = 'hardware/hwIndex.html'
+    template_name = 'hardware/hw.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -192,7 +280,7 @@ class list_hardware(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
 
-#############################
+###############################################
 
 @login_required
 def new_contact(request):
@@ -209,7 +297,7 @@ def new_contact(request):
         "form": form
     }
 
-    return render(request, "contact\contact.html", context)
+    return render(request, "contact/contact.html", context)
 
 
 @login_required
@@ -234,7 +322,7 @@ def edit_contact(request, uuid=None):
         "form": form
     }
 
-    return render(request, "contact\contact.html", context)
+    return render(request, "contact/contact.html", context)
 
 
 ##TODO add title context to view
@@ -242,7 +330,7 @@ def edit_contact(request, uuid=None):
 class list_contact(ListView):
 
     model = contact
-    template_name = 'contact/ctIndex.html'
+    template_name = 'contact/c.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -270,7 +358,7 @@ class list_contact(ListView):
         return super(list_contact, self).dispatch(request, *args, **kwargs)
 
 
-#############################
+###############################################
 @login_required
 def new_airbill(request):
     title = 'New Airbill'
@@ -314,11 +402,10 @@ def edit_airbill(request, uuid=None):
     return render(request, "airbill/airbill.html", context)
 
 
-
 class list_airbill(ListView):
 
     model = airbill
-    template_name = 'airbill/abIndex.html'
+    template_name = 'airbill/ab.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -347,7 +434,7 @@ class list_airbill(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(list_airbill, self).dispatch(request, *args, **kwargs)
 
-###########################
+###############################################
 
 @login_required
 def new_pool(request):
@@ -364,7 +451,7 @@ def new_pool(request):
         "form": form
     }
 
-    return render(request, "airbill/airbill.html", context)
+    return render(request, "pool/pool.html", context)
 
 
 @login_required
@@ -389,13 +476,13 @@ def edit_pool(request, uuid=None):
         "form": form
     }
 
-    return render(request, "airbill/airbill.html", context)
+    return render(request, "pool/pool.html", context)
 
 
 class list_pool(ListView):
 
     model = pool
-    template_name = 'pool/poolIndex.html'
+    template_name = 'pool/p.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -422,3 +509,13 @@ class list_pool(ListView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(list_pool, self).dispatch(request, *args, **kwargs)
+
+
+###############################################
+##TODO Remove Example view and Templates
+
+class HelloPDFView(PDFTemplateView):
+    template_name = "pdf/hello.html"
+
+    def get_context_data(self, **kwargs):
+        self.evID = self.kwargs['evid']

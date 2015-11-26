@@ -1,0 +1,76 @@
+{% extends "pdf/pdf_base.html" %}
+
+{% block layout_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+        @page {
+            size: {{ pagesize|default:"Letter" }};
+            margin-left: 2cm;
+            margin-right: 2.5cm;
+            margin-top: 2.5cm;
+            margin-bottom: 2cm;
+                @frame header {
+                    -pdf-frame-content: page-header;
+                    margin-top: 1.3cm;
+                    margin-right: 2mm;
+                    margin-bottom: 1cm;
+                    margin-left: 1.2cm;
+                    }
+            }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+
+{% endblock %}
+
+{%block page_header%}
+
+{% endblock %}
+
+{% block content %}
+    <div id="content">
+    <p> {{ event.title }} </br>
+        {{ event.start }} </br>
+        {{ event.end }} </br>
+        {{ event.all_day }} </br>
+        {{ event.laptopsRequested }} </br>
+        {{ event.projectorRequested }} </br>
+        {{ event.dateShipped }} </br>
+
+        {{ event.site }} </br>
+        {{ event.nextEvent }} </br>
+        {{ event.Transition_to_event }} </br>
+        {{ event.Transition_from_event }} </br>
+        <hr>
+        {% for item in event.hwAssigned.all %}
+            {{ item.serialNum }} | {{ item.desc }} | {{ item.outUser }} </br>
+        {% endfor %}
+
+        <hr>
+
+        {% for item in event.abAssigned.all %}
+            {{ item }} </br>
+        {% endfor %}
+        <hr>
+        {% for item in event.caseAssigned.all %}
+            {{ item.caseName }}____
+        {% endfor %}
+         </br>
+
+        <hr>
+        {{ event.shipping_contact.lastName }}, {{ event.shipping_contact.firstName }}<br>
+        {{ event.shipping_contact.address1 }}<br>
+        {{ event.shipping_contact.address2 }}<br>
+        {{ event.shipping_contact.city }} {{ event.shipping_contact.zip }}, {{ event.shipping_contact.state }}
+        <hr>
+        {% for item in event.instructor_contact.all%}
+            {{ item.lastName }}, {{ item.firstName }} <br>
+        {% endfor %}
+        <hr>
+        {{ event.url }}
+        <hr>
+        {{ event.pool.cost_center }}
+
+    </p>
+    </div>
+{% endblock %}

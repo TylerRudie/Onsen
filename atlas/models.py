@@ -2,9 +2,11 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import timedelta
+from django.utils import timezone
+from django.core.validators import MinValueValidator
 import uuid
 
-
+###############################################
 class contact(models.Model):
     ctID      = models.UUIDField(primary_key=True,
                                  default=uuid.uuid4,
@@ -31,6 +33,7 @@ class contact(models.Model):
 
     def __unicode__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
+###############################################
 
 class pool(models.Model):
 
@@ -42,19 +45,19 @@ class pool(models.Model):
                                 blank=True,
                                 max_length=200)
 
-    Contact = models.ForeignKey(contact)
+    contact = models.ForeignKey(contact)
 
+    cost_center = models.IntegerField(blank=True,
+                                    validators=[MinValueValidator(0)],
+                                    null=True
+                                    )
     def __unicode__(self):
         return  self.poolName
-
+###############################################
 
 class hardware(models.Model):
-    # status_choices = (
-    #     ('a','Active'),
-    #     ('s','Standby'),
-    #     ('i','Inactive'),
-    # )
-    hwId      = models.UUIDField(primary_key=True,
+
+    hwID      = models.UUIDField(primary_key=True,
                                  default=uuid.uuid4,
                                  editable=False)
 
@@ -75,13 +78,47 @@ class hardware(models.Model):
     def __unicode__(self):
         return self.serialNum
 
+    def status(self):
+
+        if (assignment.objects.filter(hardwareID=self.hwID,
+                                      outUser__isnull=True).count() > 0):
+            return 'Setup'
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__start__gt= timezone.now() ).count() > 0):
+            return 'TransferTo'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__start__lte= timezone.now(),
+                                        eventID__end__gt= timezone.now() ).count() > 0):
+            return 'AtEvent'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__end__lte= timezone.now() ).count() > 0):
+            return 'TransferFrom'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        outUser__isnull=False,
+                                        eventID__end__lte= timezone.now() ).count() > 0):
+            return 'TransferFrom'
+
+        else:
+            return 'Available'
+###############################################
 
 class case(models.Model):
-    caseID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    caseName = models.CharField('Case ID', blank=True, max_length=200)
+    caseID = models.UUIDField(primary_key=True,
+                              default=uuid.uuid4,
+                              editable=False)
+
+    caseName = models.CharField('Case ID',
+                                blank=True,
+                                max_length=200)
     def __unicode__(self):
         return self.caseName
-
+###############################################
 
 class airbill(models.Model):
 
@@ -99,14 +136,26 @@ class airbill(models.Model):
 
     def __unicode__(self):
         return self.tracking
+###############################################
 
+class configuration (models.Model):
+    cfgID =     models.UUIDField(primary_key=True,
+                                default=uuid.uuid4,
+                                editable=False)
+
+    cfg_name =  models.CharField('Title',
+                                blank=True,
+                                max_length=200)
+
+    days_Conf = models.IntegerField(blank=True,
+                                    validators=[MinValueValidator(0)],
+                                    null=True
+                                    )
+    def __unicode__(self):
+        return self.cfg_name
+###############################################
 
 class event(models.Model):
-    status_choices = (
-        ('e','Event'),
-        ('i','Inactive'),
-        # ('p','Pool'),
-    )
 
     evID    =  models.UUIDField(primary_key=True,
                              default=uuid.uuid4,
@@ -124,7 +173,8 @@ class event(models.Model):
                                   default=False)
 
     laptopsRequested = models.IntegerField(blank=True,
-                                           null=True)
+                                            validators=[MinValueValidator(0)],
+                                            null=True)
 
     projectorRequested = models.BooleanField(default=False)
 
@@ -132,9 +182,7 @@ class event(models.Model):
                                    blank=True,
                                    null=True)
 
-    status = models.CharField(max_length=100,
-                              choices=status_choices,
-                              default='Event')
+    status = models.BooleanField(default=True)
 
     hwAssigned = models.ManyToManyField(hardware,
                                         blank=True,
@@ -142,19 +190,30 @@ class event(models.Model):
                                         verbose_name='Assigned Hardware',
                                         related_name='events')
 
-    ctAssigned = models.ManyToManyField(contact,
-                                        through='contact_event',
-                                        blank=True,
-                                        verbose_name='Assigned Contacts')
+    shipping_contact = models.ForeignKey(contact,
+                                         blank = True,
+                                         null = True,
+                                         related_name='shippingCnt'
+                                        )
+
+    instructor_contact = models.ManyToManyField(contact,
+                                                blank = True,
+                                                related_name='instCnt'
+                                                )
 
     abAssigned = models.ManyToManyField(airbill,
                                         through='event_airbill',
                                         blank=True,
                                         verbose_name='Assigned Airbills')
 
-    caseAssigned = models.ManyToManyField(case, blank=True)
+    caseAssigned = models.ManyToManyField(case,
+                                          blank=True)
 
-    site = models.CharField(max_length=200, blank=True)
+    configAssigned = models.ManyToManyField(configuration,
+                                            blank=True)
+
+    site = models.CharField(max_length=200,
+                            blank=True)
 
     nextEvent = models.ForeignKey("self",
                                   blank=True,
@@ -167,25 +226,19 @@ class event(models.Model):
                              null=True,
                              verbose_name='Pool')
 
-
-
-
-
     def __unicode__(self):
         return self.title
 
 
-    # def _getStartWeek(self):
-    #     return self.startDate.isocalendar()[1]
-
-    def Transition_To_Event(self):
+    def Transition_to_event(self):
         if (self.prevEvent.count() > 0 ):
             return None
         elif (self.start):
             return self.start - timedelta(days=settings.TRANS_DAYS)
         else:
             return None
-        Tran_To_Event.verbose = ''
+        Tran_to_event.verbose = ''
+
 
     def Transition_from_event(self):
         if (self.nextEvent):
@@ -196,35 +249,19 @@ class event(models.Model):
             return None
     Transition_from_event.short_description = 'Transition from Event'
 
+
+
     @property
     def url(self):
-
         return '/events/edit/' +  str(self.evID) + '/'
-
-
-    # TranToEvent = property(_getTranToEvent)
-    # TranFromEvent = property(_getTranFromEvent)
-    #
-    # startWeek = property(_getStartWeek)
 
     class Meta:
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
 
 
-class contact_event(models.Model):
 
-    ctID       = models.ForeignKey(contact)
-    evID       = models.ForeignKey(event)
-    isShipping = models.BooleanField(default=False)
-    isInst     = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.ctID.firstName + ' ' + self.ctID.lastName + '<>' + self.evID.title
-
-    class meta:
-        verbose_name = 'Assigned Contacts'
-
+###############################################
 
 class event_airbill(models.Model):
 
@@ -240,17 +277,27 @@ class event_airbill(models.Model):
 
 
 class assignment(models.Model):
+
+    asgID = models.UUIDField(primary_key=True,
+                                default=uuid.uuid4,
+                                editable=False)
+
     eventID = models.ForeignKey(event)
+
     hardwareID = models.ForeignKey(hardware)
+
     outTimeStamp = models.DateTimeField('Outbound Timestamp',
                                         blank=True,
                                         null=True)
+
     outUser = models.ForeignKey(User, blank=True,
                                 related_name='checkout_user',
                                 null=True)
+
     inTimeStamp = models.DateTimeField('Inbound Timestamp',
                                        blank=True,
                                        null=True)
+
     inUser = models.ForeignKey(User, blank=True,
                                related_name='checkin_user',
                                null=True)
