@@ -1,7 +1,6 @@
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
-
 from django.conf import settings
 from django.http import HttpResponse
 from fullcalendar.util import events_to_json, calendar_options
@@ -11,13 +10,9 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 
-import datatableview
-
-from datatableview.views import DatatableView, XEditableDatatableView
-from datatableview import helpers
-
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
 from .models import event, hardware, contact, airbill, pool, assignment
+from django_datatables_view.base_datatable_view import BaseDatatableView
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
@@ -62,10 +57,17 @@ def home(request):
     return render(request, "home.html", {})
 
 ###############################################
+
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html", {})
+
+
+###############################################
 @login_required
 def calendar(request):
     event_url = 'all_events/'
-    return render(request, 'events/calendar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
+    return render(request, 'events/cl.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
 # Create your views here.
 
 
@@ -220,7 +222,6 @@ def new_hardware(request):
 
     return render(request, "hardware/hardware.html", context)
 
-
 @login_required
 def edit_hardware(request, uuid=None):
     title = 'Edit Hardware'
@@ -249,7 +250,7 @@ def edit_hardware(request, uuid=None):
 class list_hardware(ListView):
 
     model = hardware
-    template_name = 'hardware/hwIndex.html'
+    template_name = 'hardware/hw.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -278,18 +279,6 @@ class list_hardware(ListView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
-
-
-class hardwareDatatableView(DatatableView):
-    model = hardware
-    datatable_options = {
-        'structure_template': "datatableview/bootstrap_structure.html",
-        'columns': [
-            'serialNum',
-            'desc',
-            'config',
-        ]
-    }
 
 ###############################################
 
@@ -341,7 +330,7 @@ def edit_contact(request, uuid=None):
 class list_contact(ListView):
 
     model = contact
-    template_name = 'contact/ctIndex.html'
+    template_name = 'contact/c.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -416,7 +405,7 @@ def edit_airbill(request, uuid=None):
 class list_airbill(ListView):
 
     model = airbill
-    template_name = 'airbill/abIndex.html'
+    template_name = 'airbill/ab.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -462,7 +451,7 @@ def new_pool(request):
         "form": form
     }
 
-    return render(request, "airbill/airbill.html", context)
+    return render(request, "pool/pool.html", context)
 
 
 @login_required
@@ -487,13 +476,13 @@ def edit_pool(request, uuid=None):
         "form": form
     }
 
-    return render(request, "airbill/airbill.html", context)
+    return render(request, "pool/pool.html", context)
 
 
 class list_pool(ListView):
 
     model = pool
-    template_name = 'pool/poolIndex.html'
+    template_name = 'pool/p.html'
     paginate_by = settings.NUM_PER_PAGE
 
 

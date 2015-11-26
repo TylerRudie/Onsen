@@ -22,6 +22,11 @@ from atlas.views import *
 urlpatterns = [
     url(r'^$', 'atlas.views.home', name='home'),
 
+###################
+
+    url(r'^dashboard/',
+        'atlas.views.dashboard',
+        name='dashboard'),
 
 ###################
 
@@ -67,11 +72,6 @@ urlpatterns = [
         list_hardware.as_view(),
         name='hardware_list'),
 
-    url(r'^hardware/list2/$',
-        hardwareDatatableView.as_view(),
-        name='hardware_list2'),
-
-
 ###################
 
     url(r'^contact/new/$',
@@ -113,6 +113,7 @@ urlpatterns = [
     url(r'^pool/list/$',
         list_pool.as_view(),
         name='pool_list'),
+
 ###################
     url(r'^accounts/profile/$',  'atlas.views.home_redirect'),
 
