@@ -117,7 +117,7 @@ USE_TZ = True
 # Atlas Global Settings
 
 TRANS_DAYS = 4
-NUM_PER_PAGE = 2
+NUM_PER_PAGE = 10
 
 # Crispy Forms Settings
 

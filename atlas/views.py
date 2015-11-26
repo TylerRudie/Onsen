@@ -258,22 +258,22 @@ class list_hardware(ListView):
         context = super(list_hardware, self).get_context_data(**kwargs)
         obj_y = hardware.objects.all()
 
-        print obj_y.count()
+        # print obj_y.count()
+        #
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        #
+        # print obj_z.object_list
 
-        paginator = Paginator(obj_y, self.paginate_by)
-
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-
-        print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
     @method_decorator(login_required)
@@ -337,20 +337,20 @@ class list_contact(ListView):
     def get_context_data(self, **kwargs):
         context = super(list_contact, self).get_context_data(**kwargs)
         obj_y = contact.objects.all()
-        #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
+        # #print obj_y.count()
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        # #print obj_z.object_list
 
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
     @method_decorator(login_required)
@@ -412,21 +412,21 @@ class list_airbill(ListView):
     def get_context_data(self, **kwargs):
         context = super(list_airbill, self).get_context_data(**kwargs)
         obj_y = airbill.objects.all()
-        #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
+        # #print obj_y.count()
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        #
+        # #print obj_z.object_list
 
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
 
@@ -490,20 +490,20 @@ class list_pool(ListView):
         context = super(list_pool, self).get_context_data(**kwargs)
         obj_y = pool.objects.all()
         #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        #
+        # #print obj_z.object_list
 
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
     @method_decorator(login_required)
