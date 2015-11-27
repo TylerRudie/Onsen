@@ -53,6 +53,8 @@ class pool(models.Model):
                                     validators=[MinValueValidator(0)],
                                     null=True
                                     )
+    retired = models.BooleanField(default=False)
+
     def __unicode__(self):
         return  self.poolName
 ###############################################
@@ -82,29 +84,33 @@ class hardware(models.Model):
 
     def status(self):
 
-        if (assignment.objects.filter(hardwareID=self.hwID,
+        if self.poolID.retired:
+            return 'Retired'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
+                                        eventID__limbo=True
+                                        ).count() > 0):
+            return 'Limbo'
+
+        elif (assignment.objects.filter(hardwareID=self.hwID,
                                       outUser__isnull=True).count() > 0):
             return 'Setup'
+
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
                                         eventID__start__gt= timezone.now() ).count() > 0):
-            return 'TransferTo'
+            return 'Transfer To'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
                                         eventID__start__lte= timezone.now(),
                                         eventID__end__gt= timezone.now() ).count() > 0):
-            return 'AtEvent'
+            return 'At Event'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
                                         eventID__end__lte= timezone.now() ).count() > 0):
-            return 'TransferFrom'
-
-        elif (assignment.objects.filter(hardwareID=self.hwID,
-                                        outUser__isnull=False,
-                                        eventID__end__lte= timezone.now() ).count() > 0):
-            return 'TransferFrom'
+            return 'Transfer From'
 
         else:
             return 'Available'
@@ -153,6 +159,8 @@ class configuration (models.Model):
                                     validators=[MinValueValidator(0)],
                                     null=True
                                     )
+    not_load = models.BooleanField(default=False)
+
     def __unicode__(self):
         return self.cfg_name
 ###############################################
@@ -229,6 +237,8 @@ class event(models.Model):
                              null=True,
                              verbose_name='Pool')
 
+    limbo = models.BooleanField(default=False)
+
     def __unicode__(self):
         return self.title
 
@@ -258,10 +268,10 @@ class event(models.Model):
     Transition_from_event.short_description = 'Transition from Event'
 
 
-
+## TODO setup with reverse URL lookup
     @property
     def url(self):
-        return '/events/edit/' +  str(self.evID) + '/'
+        return '/events/edit/' + str(self.evID) + '/'
 
     class Meta:
         verbose_name = 'Event'
