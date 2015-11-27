@@ -1,9 +1,11 @@
 from django.db import models
+from django.db.models import Sum
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+import atlas.util
 import uuid
 
 ###############################################
@@ -155,6 +157,7 @@ class configuration (models.Model):
         return self.cfg_name
 ###############################################
 
+
 class event(models.Model):
 
     evID    =  models.UUIDField(primary_key=True,
@@ -234,19 +237,24 @@ class event(models.Model):
         if (self.prevEvent.count() > 0 ):
             return None
         elif (self.start):
-            return self.start - timedelta(days=settings.TRANS_DAYS)
+            cfgDays = self.configAssigned.all().aggregate(Sum('days_Conf'))
+            totalDays = cfgDays['days_Conf__sum'] + settings.TRANS_DAYS
+            return atlas.util.sub_business_days(self.start, totalDays)
         else:
             return None
-        Tran_to_event.verbose = ''
 
+
+    Transition_to_event.short_description = 'Transition to Event'
 
     def Transition_from_event(self):
         if (self.nextEvent):
             return None
         elif (self.end):
-            return self.end + timedelta(days=settings.TRANS_DAYS)
+            return atlas.util.add_business_days(self.end, settings.TRANS_DAYS)
         else:
             return None
+
+
     Transition_from_event.short_description = 'Transition from Event'
 
 

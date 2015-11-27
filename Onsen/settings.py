@@ -116,7 +116,8 @@ USE_TZ = True
 
 # Atlas Global Settings
 
-TRANS_DAYS = 4
+TRANS_DAYS = 2
+## todo remove NUM_PER_PAGE after listview is converted to smartadmin
 NUM_PER_PAGE = 10
 
 # Crispy Forms Settings

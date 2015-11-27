@@ -110,7 +110,7 @@ def edit_event(request, uuid=None):
     else:
         form = eventForm(instance=thisEvent)
 
-    print thisEvent
+    #print thisEvent
 
 
     context = {
@@ -195,10 +195,15 @@ class checkin_hardware(ListView):
                 print(item)
                 print(request.user)
                 print(timezone.now())
+                record = assignment.objects.get(asgID=item)
+                record.inUser = request.user
+                record.inTimeStamp = timezone.now()
+                record.save()
 
-            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
-        else:
-            return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+
+
+
+        return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
 
 
 
