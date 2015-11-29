@@ -173,7 +173,6 @@ class event(models.Model):
                              editable=False)
 
     title   = models.CharField('Title',
-                             blank=True,
                              max_length=200)
 
     start   = models.DateTimeField('Start')
@@ -248,7 +247,14 @@ class event(models.Model):
             return None
         elif (self.start):
             cfgDays = self.configAssigned.all().aggregate(Sum('days_Conf'))
-            totalDays = cfgDays['days_Conf__sum'] + settings.TRANS_DAYS
+            print(cfgDays)
+            if cfgDays['days_Conf__sum'] is None:
+                totalDays = settings.TRANS_DAYS
+
+            else:
+                totalDays = cfgDays['days_Conf__sum'] + settings.TRANS_DAYS
+
+
             return atlas.util.sub_business_days(self.start, totalDays)
         else:
             return None

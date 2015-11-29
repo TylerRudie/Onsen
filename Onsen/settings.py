@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'bootstrap3_datetime',
     'registration',
     'easy_pdf',
-
+    'better_filter_widget',
     ## Project
     'fullcalendar',
     'atlas',

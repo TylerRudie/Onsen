@@ -2,7 +2,8 @@ from django.contrib import admin
 from datetime import *
 from .models import *
 from django.contrib.contenttypes.admin import GenericTabularInline
-
+from django import forms
+from better_filter_widget import BetterFilterWidget
 
 class assingmentInline(admin.StackedInline):
     model = assignment
@@ -26,6 +27,9 @@ class HardwareAdmin(admin.ModelAdmin):
     inlines = [assingmentInline,]
     list_display = ['serialNum','desc','status']
     search_fields = ['serialNum','desc']
+
+
+
 
 class EventAdmin(admin.ModelAdmin):
     model = event

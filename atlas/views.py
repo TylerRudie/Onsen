@@ -1,4 +1,5 @@
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
+from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -83,16 +84,24 @@ def new_event(request):
     form = eventForm(request.POST or None)
 
     if request.POST:
-            form = eventForm(request.POST)
-            if form.is_valid():
-                form.save()
+        form = eventForm(request.POST)
+        if form.is_valid():
+            fm = form.save(commit=False)
+            fm.save()
+            for asg_post in form.cleaned_data.get('hwAssigned'):
+                hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                hwd_asg.save()
+        print(request.POST)
+        return HttpResponseRedirect('/')
 
-    return render(request, "events\event.html", context)
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "events/event.html", context)
 
 
 @login_required
@@ -100,26 +109,28 @@ def edit_event(request, uuid=None):
     title = 'Edit Event'
     if uuid:
         thisEvent = get_object_or_404(event, evID=uuid)
-## TODO fix M2M save 'Cannot set values on a ManyToManyField which specifies an intermediary model.'
-    ## http://stackoverflow.com/questions/387686/what-are-the-steps-to-make-a-modelform-work-with-a-manytomany-relationship-with
+
     if request.POST:
-        form = eventForm(request.POST, instance=thisEvent)
+        form = eventForm(request.POST)
         if form.is_valid():
-            form.save()
+                fm = form.save(commit=False)
+                fm.save()
+                for asg_post in form.cleaned_data.get('hwAssigned'):
+                    hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
+                    hwd_asg.save()
+        print(request.POST)
+        return HttpResponseRedirect('/')
 
     else:
+
         form = eventForm(instance=thisEvent)
+        context = {
+            "title": title,
+            "form": form,
+            "evID": thisEvent.evID
+        }
 
-    #print thisEvent
-
-
-    context = {
-        "title": title,
-        "form": form,
-        "evID": thisEvent.evID
-    }
-
-    return render(request, "events/event.html", context)
+        return render(request, "events/event.html", context)
 
 
 class packing_pdfView(PDFTemplateView):

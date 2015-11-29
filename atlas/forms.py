@@ -3,10 +3,30 @@ from .models import event, hardware, contact, airbill, pool
 from bootstrap3_datetime.widgets import DateTimePicker
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
-from crispy_forms.bootstrap import StrictButton
-
+from crispy_forms.bootstrap import TabHolder, Tab
+from better_filter_widget import BetterFilterWidget
 
 class eventForm(forms.ModelForm):
+    helper = FormHelper()
+    helper.form_tag = False
+    helper.layout = Layout(
+        TabHolder(
+            Tab(
+                'Basic Information',
+                'start',
+                'last_name'
+            ),
+            Tab(
+                'Address',
+                'laptopsRequested',
+            ),
+            Tab(
+                'Contact',
+                'hwAssigned',
+            )
+        )
+    )
+
     class Meta:
         model = event
         exclude = ['evID', 'status']
@@ -22,7 +42,9 @@ class eventForm(forms.ModelForm):
 
             'dateShipped': DateTimePicker(options={"format": "YYYY-MM-DD HH:mm",
                                                    "pickSeconds": False
-                                                   })
+                                                   }),
+            'hwAssigned': BetterFilterWidget(),
+            'instructor_contact': BetterFilterWidget(),
         }
         readonly_fields = ['Transition_To_Event']
 
