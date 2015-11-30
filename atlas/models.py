@@ -86,9 +86,14 @@ class hardware(models.Model):
                                  blank=True)
 
     type      = models.CharField(max_length=100,
-                                 blank=True)
+                                 blank=True,
+                                 choices=settings.HARDWARE_TYPES)
 
     poolID    = models.ForeignKey(pool)
+
+    class Meta:
+            verbose_name = 'Hardware'
+            verbose_name_plural = 'Hardware'
 
     def __unicode__(self):
         return self.serialNum
@@ -135,9 +140,9 @@ class hardware(models.Model):
         else:
             return 'Available'
 
-        class Meta:
-            verbose_name = 'Hardware'
-            verbose_name_plural = 'Hardware'
+
+
+
 
 ###############################################
 
@@ -152,6 +157,7 @@ class case(models.Model):
     def __unicode__(self):
         return self.caseName
 ###############################################
+
 
 class airbill(models.Model):
 
@@ -222,7 +228,8 @@ class event(models.Model):
                                         blank=True,
                                         through='assignment',
                                         verbose_name='Assigned Hardware',
-                                        related_name='events')
+                                        related_name='events',
+                                        )
 
     shipping_contact = models.ForeignKey(contact,
                                          blank = True,

@@ -50,6 +50,10 @@ class eventForm(forms.ModelForm):
         )
     )
 
+    def __init__(self, *args, **kwargs):
+        super(eventForm, self).__init__(*args, **kwargs)
+
+
     class Meta:
         model = event
         exclude = ['evID', 'status']

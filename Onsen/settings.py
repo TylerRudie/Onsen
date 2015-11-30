@@ -121,6 +121,16 @@ TRANS_DAYS = 2
 ## todo remove NUM_PER_PAGE after listview is converted to smartadmin
 NUM_PER_PAGE = 10
 
+HARDWARE_TYPES = (
+    ('Laptop','Laptop'),
+    ('Workstation','Workstation'),
+    ('Server', 'Server'),
+    ('Monitor', 'Monitor'),
+    ('Projector', 'Projector'),
+    ('SpaceMouse', 'SpaceMouse'),
+    ('Miscellaneous', 'Miscellaneous'),
+    )
+
 # Crispy Forms Settings
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
