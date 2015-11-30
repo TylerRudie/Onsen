@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 
 from .util import get_default_pool
-from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
@@ -178,6 +178,7 @@ class srf_pdfView(PDFTemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
 
+# TODO add Checkout View
 
 class checkin_hardware(ListView):
     model = assignment
@@ -242,6 +243,21 @@ def new_hardware(request):
             if form.is_valid():
                 form.save()
 
+    context = {
+        "title": title,
+        "form": form
+    }
+
+    return render(request, "hardware/hardware.html", context)
+
+@login_required
+def multiNewHardware(request):
+    title = 'multi New Hardware'
+    form = multiHardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
+
+    if request.POST:
+            form = multiHardwareForm(request.POST)
+            print(form)
 
 
     context = {
@@ -249,7 +265,8 @@ def new_hardware(request):
         "form": form
     }
 
-    return render(request, "hardware/hardware.html", context)
+    return render(request, "hardware/multiHardware.html", context)
+
 
 @login_required
 def edit_hardware(request, uuid=None):

@@ -64,6 +64,10 @@ urlpatterns = [
         'atlas.views.new_hardware',
         name='hardware_new'),
 
+    url(r'^hardware/multi/$',
+        'atlas.views.multiNewHardware',
+        name='hardware_multiNew'),
+
     url(r'^hardware/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
         'atlas.views.edit_hardware',
         name='hardware_edit'),

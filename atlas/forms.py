@@ -80,7 +80,26 @@ class hardwareForm(forms.ModelForm):
         model = hardware
         exclude = ['hwID', ]
 
+class multiHardwareForm(forms.Form):
+    like_website = forms.CharField()
+    favorite_number = forms.CharField()
+    favorite_color = forms.CharField()
+    favorite_food = forms.CharField()
+    poolID = forms.CharField()
+    def __init__(self, *args, **kwargs):
+        super(multiHardwareForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Fieldset(
+                'first arg is the legend of the fieldset',
+                'like_website',
+                'favorite_number',
+                'favorite_color',
+                'favorite_food',
+                'poolID'
+            ),
 
+        )
 
 class contactForm(forms.ModelForm):
     class Meta:

@@ -74,12 +74,15 @@ class hardware(models.Model):
                                  default=uuid.uuid4,
                                  editable=False)
 
-    serialNum = models.CharField(max_length=100)
+    serialNum = models.CharField('Serial Number',
+                                 max_length=100)
 
-    desc      = models.CharField(max_length=100,
+    desc      = models.CharField('Description',
+                                 max_length=100,
                                  blank=True)
 
-    config    = models.CharField(max_length=100,
+    config    = models.CharField('Configuration',
+                                 max_length=100,
                                  blank=True)
 
     type      = models.CharField(max_length=100,
