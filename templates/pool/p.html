@@ -119,7 +119,8 @@
                                 <thead>
                                 <tr>
                                     <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i>Pool Name</th>
-                                    <th data-hide="phone"><i class="fa fa-fw fa-phone text-muted hidden-md hidden-sm hidden-xs"></i>Contact</th>
+                                    <th data-hide="phone"><i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs"></i>Contact</th>
+                                    <th><i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs"></i>Pool</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -128,6 +129,7 @@
                                     <td> <a href="{% url 'pool_edit' uuid=item.poolID %}">{{ item }}</a>
                                     </td>
                                     <td>{{ item.Contact }}</td>
+                                    <td>{{ item.default }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

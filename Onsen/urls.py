@@ -119,15 +119,15 @@ urlpatterns = [
 
     url(r'^accounts/', include('registration.backends.default.urls')),
 
+    url(r'help/', include('wiki.urls')),
+
     url(r'^admin/',
         include(admin.site.urls)),
 
     # (r'^notifications/', get_nyt_pattern()),
     # (r'^wiki/$', get_wiki_pattern())
-    url(r'^pdf/$', HelloPDFView.as_view())
+
 ]
-
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

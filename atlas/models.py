@@ -5,8 +5,13 @@ from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from exclusivebooleanfield.fields import ExclusiveBooleanField
 import atlas.util
 import uuid
+
+
+
+
 
 ###############################################
 class contact(models.Model):
@@ -47,13 +52,17 @@ class pool(models.Model):
                                 blank=True,
                                 max_length=200)
 
-    contact = models.ForeignKey(contact)
+    contact = models.ForeignKey(contact,
+                                blank=True,
+                                null=True)
 
     cost_center = models.IntegerField(blank=True,
                                     validators=[MinValueValidator(0)],
                                     null=True
                                     )
     retired = models.BooleanField(default=False)
+
+    default = ExclusiveBooleanField()
 
     def __unicode__(self):
         return  self.poolName
@@ -76,8 +85,7 @@ class hardware(models.Model):
     type      = models.CharField(max_length=100,
                                  blank=True)
 
-    poolID    = models.ForeignKey(pool, blank=True,
-                                  null=True)
+    poolID    = models.ForeignKey(pool)
 
     def __unicode__(self):
         return self.serialNum
@@ -88,32 +96,46 @@ class hardware(models.Model):
             return 'Retired'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
-                                        eventID__limbo=True
+                                        eventID__limbo=True,
+                                        inUser__isnull=True
                                         ).count() > 0):
             return 'Limbo'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
-                                      outUser__isnull=True).count() > 0):
+                                        outUser__isnull=True,
+                                        inUser__isnull=True
+                                        ).count() > 0):
             return 'Setup'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
-                                        eventID__start__gt= timezone.now() ).count() > 0):
+                                        inUser__isnull=True,
+                                        eventID__start__gt= timezone.now()
+                                        ).count() > 0):
             return 'Transfer To'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
+                                        inUser__isnull=True,
                                         eventID__start__lte= timezone.now(),
-                                        eventID__end__gt= timezone.now() ).count() > 0):
+                                        eventID__end__gt= timezone.now()
+                                        ).count() > 0):
             return 'At Event'
 
         elif (assignment.objects.filter(hardwareID=self.hwID,
                                         outUser__isnull=False,
-                                        eventID__end__lte= timezone.now() ).count() > 0):
+                                        inUser__isnull=True,
+                                        eventID__end__lte= timezone.now()
+                                        ).count() > 0):
             return 'Transfer From'
 
         else:
             return 'Available'
+
+        class Meta:
+            verbose_name = 'Hardware'
+            verbose_name_plural = 'Hardware'
+
 ###############################################
 
 class case(models.Model):
@@ -137,10 +159,10 @@ class airbill(models.Model):
     tracking   = models.CharField(max_length=100,
                                   )
 
-    lastStatus = models.CharField (max_length=100,
+    lastStatus = models.CharField(max_length=100,
                                    blank=True)
 
-    used       = models.BooleanField (default=False)
+    used       = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.tracking
@@ -192,7 +214,6 @@ class event(models.Model):
                                    blank=True,
                                    null=True)
 
-    status = models.BooleanField(default=True)
 
     hwAssigned = models.ManyToManyField(hardware,
                                         blank=True,
@@ -232,8 +253,6 @@ class event(models.Model):
                                   related_name='prevEvent')
 
     pool = models.ForeignKey(pool,
-                             blank=True,
-                             null=True,
                              verbose_name='Pool')
 
     limbo = models.BooleanField(default=False)

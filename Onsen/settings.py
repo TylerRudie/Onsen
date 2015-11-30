@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'registration',
     'easy_pdf',
     'better_filter_widget',
+    'exclusivebooleanfield',
     ## Project
     'fullcalendar',
     'atlas',

@@ -24,15 +24,17 @@
             <div class="col-sm-8" >
 
                 <form method="POST" action=""> {% csrf_token %}
+                    <p>
+                        {% if evID %}
+                        <input class='btn btn-default' onclick="window.location.href='{% url "event_srf_pdf" uuid=evID %}'" value='Shipping Request Form' />
+                        <input class='btn btn-default' onclick="window.location.href='{% url "event_packing_pdf" uuid=evID %}'" value='Packing Sheet' />
+                        {% endif %}
 
-                    {{ form | crispy }}
+                        <input class='btn btn-default btn-primary' type="submit" value="Submit" name="_save">
+                    </p>
+                    {% crispy form %}
 
-                    {% if evID %}
-                    <input class='btn btn-default' onclick="window.location.href='{% url "event_srf_pdf" uuid=evID %}'" value='Shipping Request Form' />
-                    <input class='btn btn-default' onclick="window.location.href='{% url "event_packing_pdf" uuid=evID %}'" value='Packing Sheet' />
-                    {% endif %}
 
-                    <input class='btn btn-default btn-primary' type="submit" value="Submit" name="_save">
 
                 </form>
 

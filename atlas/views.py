@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 
+from .util import get_default_pool
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
 from .models import event, hardware, contact, airbill, pool, assignment
 from django_datatables_view.base_datatable_view import BaseDatatableView
@@ -81,7 +82,7 @@ def all_events(request):
 @login_required
 def new_event(request):
     title = 'New Event'
-    form = eventForm(request.POST or None)
+    form = eventForm(request.POST or None, initial={'pool': get_default_pool()})
 
     if request.POST:
         form = eventForm(request.POST)
@@ -92,8 +93,18 @@ def new_event(request):
                 hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
 
                 hwd_asg.save()
-        print(request.POST)
-        return HttpResponseRedirect('/')
+            print(request.POST)
+
+            return HttpResponseRedirect('/')
+
+        else:
+            context = {
+                "title": title,
+                "form": form
+            }
+
+            return render(request, "events/event.html", context)
+
 
     else:
         context = {
@@ -224,12 +235,14 @@ class checkin_hardware(ListView):
 @login_required
 def new_hardware(request):
     title = 'New Hardware'
-    form = hardwareForm(request.POST or None)
+    form = hardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
 
     if request.POST:
             form = hardwareForm(request.POST)
             if form.is_valid():
                 form.save()
+
+
 
     context = {
         "title": title,

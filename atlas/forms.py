@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from crispy_forms.bootstrap import TabHolder, Tab
 from better_filter_widget import BetterFilterWidget
+## TODO finish filling out form data
 
 class eventForm(forms.ModelForm):
     helper = FormHelper()
@@ -13,16 +14,38 @@ class eventForm(forms.ModelForm):
         TabHolder(
             Tab(
                 'Basic Information',
+                'title',
                 'start',
-                'last_name'
+                'end',
+                'all_day',
+                'nextEvent',
+                'pool',
+
             ),
             Tab(
-                'Address',
+                'Details',
+                'site',
                 'laptopsRequested',
+                'projectorRequested',
+                'configAssigned',
+                'limbo',
+
             ),
             Tab(
-                'Contact',
+                'Contacts',
+                'shipping_contact',
+                'instructor_contact'
+            ),
+            Tab(
+                'Hardware',
                 'hwAssigned',
+            ),
+            Tab(
+                'Shipping',
+
+                'dateShipped',
+                'abAssigned',
+                'caseAssigned'
             )
         )
     )
@@ -44,15 +67,19 @@ class eventForm(forms.ModelForm):
                                                    "pickSeconds": False
                                                    }),
             'hwAssigned': BetterFilterWidget(),
+            'caseAssigned': BetterFilterWidget(),
+            'abAssigned': BetterFilterWidget(),
             'instructor_contact': BetterFilterWidget(),
         }
         readonly_fields = ['Transition_To_Event']
 
 ##TODO add save, and save and return buttons
 class hardwareForm(forms.ModelForm):
+
     class Meta:
         model = hardware
         exclude = ['hwID', ]
+
 
 
 class contactForm(forms.ModelForm):
