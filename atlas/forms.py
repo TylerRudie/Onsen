@@ -23,6 +23,13 @@ class eventForm(forms.ModelForm):
 
             ),
             Tab(
+                'Shipping',
+
+                'dateShipped',
+                'abAssigned',
+                'caseAssigned'
+            ),
+            Tab(
                 'Details',
                 'site',
                 'laptopsRequested',
@@ -40,13 +47,7 @@ class eventForm(forms.ModelForm):
                 'Hardware',
                 'hwAssigned',
             ),
-            Tab(
-                'Shipping',
 
-                'dateShipped',
-                'abAssigned',
-                'caseAssigned'
-            )
         )
     )
 
