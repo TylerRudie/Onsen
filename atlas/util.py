@@ -18,8 +18,11 @@ def sub_business_days(from_date, number_of_days):
            number_of_days -= 1
     return to_date
 
+
 def get_default_pool():
     try:
         return atlas.models.pool.objects.get(default=True)
     except atlas.models.pool.DoesNotExist:
         return None
+
+

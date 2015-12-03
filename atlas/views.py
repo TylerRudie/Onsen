@@ -10,6 +10,7 @@ from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
+from django.core.urlresolvers import reverse
 
 from .util import get_default_pool
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
@@ -77,7 +78,7 @@ def calendar(request):
 def all_events(request):
     events = event.objects.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
-##TODO add ability to delete events
+##TODO add ability to delete events and figure out why duplicaton on save
 
 @login_required
 def new_event(request):
@@ -95,7 +96,7 @@ def new_event(request):
                 hwd_asg.save()
             print(request.POST)
 
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('calendar'))
 
         else:
             context = {
@@ -130,7 +131,7 @@ def edit_event(request, uuid=None):
                     hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
                     hwd_asg.save()
         print(request.POST)
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('calendar'))
 
     else:
 
@@ -184,7 +185,7 @@ class checkin_hardware(ListView):
     model = assignment
     template_name = 'events/checkin_hardware.html'
     paginate_by = settings.NUM_PER_PAGE
-
+    # success_url = '/'
 
 
     def get_context_data(self, **kwargs):
@@ -214,20 +215,69 @@ class checkin_hardware(ListView):
     def dispatch(self, request, *args, **kwargs):
 
         if request.POST:
-            for item in request.POST.getlist('selected_hardware'):
-                print(item)
-                print(request.user)
-                print(timezone.now())
-                record = assignment.objects.get(asgID=item)
-                record.inUser = request.user
-                record.inTimeStamp = timezone.now()
-                record.save()
+            if request.POST is not None:
+                for item in request.POST.getlist('selected_hardware'):
+                    print(item)
+                    print(request.user)
+                    print(timezone.now())
+                    record = assignment.objects.get(asgID=item)
+                    record.inUser = request.user
+                    record.inTimeStamp = timezone.now()
+                    record.save()
 
 
-
+                return redirect(reverse('event_edit', kwargs=self.kwargs))
 
         return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
 
+class checkout_hardware(ListView):
+    model = assignment
+    template_name = 'events/checkout_hardware.html'
+    paginate_by = settings.NUM_PER_PAGE
+    # success_url = '/'
+
+
+    def get_context_data(self, **kwargs):
+        context = super(checkout_hardware, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        obj_y = assignment.objects.filter(eventID=uuid)
+
+        print obj_y.count()
+
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        # print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.POST:
+            if request.POST is not None:
+                for item in request.POST.getlist('selected_hardware'):
+                    print(item)
+                    print(request.user)
+                    print(timezone.now())
+                    record = assignment.objects.get(asgID=item)
+                    record.outUser = request.user
+                    record.outTimeStamp = timezone.now()
+                    record.save()
+
+
+                return redirect(reverse('event_edit', kwargs=self.kwargs))
+
+        return super(checkout_hardware, self).dispatch(request, *args, **kwargs)
 
 
 

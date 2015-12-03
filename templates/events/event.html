@@ -151,6 +151,8 @@
                 <form method="POST" action=""> {% csrf_token %}
                     <p>
                         {% if evID %}
+                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkout" uuid=evID %}'" value='Checkout Hardware' />
+                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkin" uuid=evID %}'" value='Checkin Hardware' />
                         <input class='btn btn-default' onclick="window.location.href='{% url "event_srf_pdf" uuid=evID %}'" value='Shipping Request Form' />
                         <input class='btn btn-default' onclick="window.location.href='{% url "event_packing_pdf" uuid=evID %}'" value='Packing Sheet' />
                         {% endif %}

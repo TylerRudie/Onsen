@@ -19,9 +19,9 @@ class contact(models.Model):
                                  default=uuid.uuid4,
                                  editable=False)
     firstName = models.CharField(max_length=100,
-                                 blank=True)
+                                 )
     lastName  = models.CharField(max_length=100,
-                                 blank=True)
+                                 )
     address1  = models.CharField(max_length=100,
                                  blank=True)
     address2  = models.CharField(max_length=100,
@@ -91,6 +91,8 @@ class hardware(models.Model):
 
     poolID    = models.ForeignKey(pool)
 
+    available = models.BooleanField(default=True)
+
     class Meta:
             verbose_name = 'Hardware'
             verbose_name_plural = 'Hardware'
@@ -138,6 +140,11 @@ class hardware(models.Model):
             return 'Transfer From'
 
         else:
+            ## Because i do not beleive the save will catch all of them, this is to catch what it fails
+            if self.available is not True:
+                self.available = True
+                self.save()
+
             return 'Available'
 
 
@@ -229,7 +236,8 @@ class event(models.Model):
                                         through='assignment',
                                         verbose_name='Assigned Hardware',
                                         related_name='events',
-                                        )
+                                        limit_choices_to={'available' : True})
+
 
     shipping_contact = models.ForeignKey(contact,
                                          blank = True,
@@ -357,3 +365,13 @@ class assignment(models.Model):
 
     def __unicode__(self):
         return self.eventID.title + '<>' + self.hardwareID.serialNum
+
+    def save(self, *args, **kwargs):
+
+        if self.outUser is not None and self.inUser is not None:
+            self.hardwareID.available = True
+        else:
+            self.hardwareID.available = False
+
+        self.hardwareID.save()
+        super(assignment, self).save(*args, **kwargs)

@@ -68,7 +68,7 @@ class eventForm(forms.ModelForm):
                                            "pickSeconds": False
                                            }),
 
-            'dateShipped': DateTimePicker(options={"format": "YYYY-MM-DD HH:mm",
+            'dateShipped': DateTimePicker(options={"format": "YYYY-MM-DD",
                                                    "pickSeconds": False
                                                    }),
             'hwAssigned': BetterFilterWidget(),

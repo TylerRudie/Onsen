@@ -13,6 +13,7 @@
                 <th scope="col"> Model </th>
                 <th scope="col"> Config </th>
                 <th scope="col"> Status </th>
+                <th scope="col"> Available </th>
                 </thead>
                   {% for item in page_items %}
                       <tr>
@@ -21,6 +22,7 @@
                         <td>{{ item.desc }}</td>
                         <td>{{ item.config }}</td>
                         <td>{{ item.status }}</td>
+                        <td>{{ item.available }}</td>
                       </tr>
                   {% endfor %}
             </table>

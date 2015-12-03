@@ -25,7 +25,7 @@ class HardwareAdmin(admin.ModelAdmin):
     fields = ['serialNum','desc','config','poolID']
 
     inlines = [assingmentInline,]
-    list_display = ['serialNum','desc','status']
+    list_display = ['serialNum','desc','status', 'available']
     search_fields = ['serialNum','desc']
 
 

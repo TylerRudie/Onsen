@@ -58,6 +58,9 @@ urlpatterns = [
         checkin_hardware.as_view(),
         name='event_checkin'),
 
+    url(r'^events/checkout/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        checkout_hardware.as_view(),
+        name='event_checkout'),
 ###################
 
     url(r'^hardware/new/$',
