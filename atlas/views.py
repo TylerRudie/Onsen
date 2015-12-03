@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from .util import get_default_pool
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
-from django_datatables_view.base_datatable_view import BaseDatatableView
+# from django_datatables_view.base_datatable_view import BaseDatatableView
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
@@ -123,7 +123,7 @@ def edit_event(request, uuid=None):
         thisEvent = get_object_or_404(event, evID=uuid)
 
     if request.POST:
-        form = eventForm(request.POST)
+        form = eventForm(request.POST, instance=thisEvent)
         if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
