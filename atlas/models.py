@@ -236,7 +236,7 @@ class event(models.Model):
                                         through='assignment',
                                         verbose_name='Assigned Hardware',
                                         related_name='events',
-                                        limit_choices_to={'available' : True})
+                                        )
 
 
     shipping_contact = models.ForeignKey(contact,

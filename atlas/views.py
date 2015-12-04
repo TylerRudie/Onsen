@@ -90,6 +90,7 @@ def new_event(request):
         if form.is_valid():
             fm = form.save(commit=False)
             fm.save()
+
             for asg_post in form.cleaned_data.get('hwAssigned'):
                 hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
 
@@ -127,15 +128,25 @@ def edit_event(request, uuid=None):
         if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
-                for asg_post in form.cleaned_data.get('hwAssigned'):
-                    hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
-                    hwd_asg.save()
+                fmList = form.cleaned_data.get('hwAssigned').all()
+                objList = thisEvent.hwAssigned.all()
+
+                for asg_post in fmList:
+                    if asg_post not in objList:
+                        hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
+                        hwd_asg.save()
+
+                for obj in objList:
+                    if obj not in fmList:
+                        obj.delete()
+
         print(request.POST)
         return HttpResponseRedirect(reverse('calendar'))
 
     else:
 
         form = eventForm(instance=thisEvent)
+        print(thisEvent.hwAssigned.all())
         context = {
             "title": title,
             "form": form,
@@ -153,9 +164,8 @@ class packing_pdfView(PDFTemplateView):
         uuid = self.kwargs['uuid']
         ev = get_object_or_404(event, evID=uuid)
 
-
         context["event"] = ev
-        # context["contact"] =
+
         return context
 
     @method_decorator(login_required)
