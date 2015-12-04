@@ -11,12 +11,13 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from .util import get_default_pool
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
 # from django_datatables_view.base_datatable_view import BaseDatatableView
-
+## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
@@ -78,15 +79,16 @@ def calendar(request):
 def all_events(request):
     events = event.objects.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
-##TODO add ability to delete events and figure out why duplicaton on save
+##TODO add ability to delete events
 
 @login_required
 def new_event(request):
     title = 'New Event'
     form = eventForm(request.POST or None, initial={'pool': get_default_pool()})
-
+    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
         form = eventForm(request.POST)
+
         if form.is_valid():
             fm = form.save(commit=False)
             fm.save()
@@ -95,7 +97,6 @@ def new_event(request):
                 hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
 
                 hwd_asg.save()
-            print(request.POST)
 
             return HttpResponseRedirect(reverse('calendar'))
 
@@ -125,6 +126,7 @@ def edit_event(request, uuid=None):
 
     if request.POST:
         form = eventForm(request.POST, instance=thisEvent)
+
         if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
@@ -152,6 +154,7 @@ def edit_event(request, uuid=None):
     else:
 
         form = eventForm(instance=thisEvent)
+        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q( events__hwAssigned__events__evID=thisEvent.evID))
         print(thisEvent.hwAssigned.all())
         context = {
             "title": title,
@@ -194,8 +197,6 @@ class srf_pdfView(PDFTemplateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
-
-# TODO add Checkout View
 
 class checkin_hardware(ListView):
     model = assignment
@@ -282,9 +283,9 @@ class checkout_hardware(ListView):
         if request.POST:
             if request.POST is not None:
                 for item in request.POST.getlist('selected_hardware'):
-                    print(item)
-                    print(request.user)
-                    print(timezone.now())
+                    # print(item)
+                    # print(request.user)
+                    # print(timezone.now())
                     record = assignment.objects.get(asgID=item)
                     record.outUser = request.user
                     record.outTimeStamp = timezone.now()
@@ -370,20 +371,6 @@ class list_hardware(ListView):
         context = super(list_hardware, self).get_context_data(**kwargs)
         obj_y = hardware.objects.all()
 
-        # print obj_y.count()
-        #
-        # paginator = Paginator(obj_y, self.paginate_by)
-        #
-        # page = self.request.GET.get('page')
-        #
-        # try:
-        #     obj_z = paginator.page(page)
-        # except PageNotAnInteger:
-        #     obj_z = paginator.page(1)
-        # except EmptyPage:
-        #     obj_z = paginator.page(paginator.num_pages)
-        #
-        # print obj_z.object_list
 
         context['page_items'] = obj_y
         return context
@@ -449,18 +436,7 @@ class list_contact(ListView):
     def get_context_data(self, **kwargs):
         context = super(list_contact, self).get_context_data(**kwargs)
         obj_y = contact.objects.all()
-        # #print obj_y.count()
-        # paginator = Paginator(obj_y, self.paginate_by)
-        #
-        # page = self.request.GET.get('page')
-        #
-        # try:
-        #     obj_z = paginator.page(page)
-        # except PageNotAnInteger:
-        #     obj_z = paginator.page(1)
-        # except EmptyPage:
-        #     obj_z = paginator.page(paginator.num_pages)
-        # #print obj_z.object_list
+
 
         context['page_items'] = obj_y
         return context
@@ -503,7 +479,7 @@ def edit_airbill(request, uuid=None):
     else:
         form = airbillForm(instance=thisObj)
 
-    print thisObj
+    # print thisObj
 
 
     context = {
@@ -580,7 +556,7 @@ def edit_pool(request, uuid=None):
     else:
         form = poolForm(instance=thisObj)
 
-    print thisObj
+    # print thisObj
 
 
     context = {
