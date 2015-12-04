@@ -363,6 +363,9 @@ class assignment(models.Model):
                                related_name='checkin_user',
                                null=True)
 
+    class Meta:
+        unique_together = ('eventID', 'hardwareID',)
+
     def __unicode__(self):
         return self.eventID.title + '<>' + self.hardwareID.serialNum
 
