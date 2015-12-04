@@ -47,7 +47,7 @@ class EventAdmin(admin.ModelAdmin):
 admin.site.register(event, EventAdmin)
 admin.site.register(contact )
 admin.site.register(hardware, HardwareAdmin)
-
+admin.site.register(assignment)
 admin.site.register(airbill)
 admin.site.register(case)
 admin.site.register(pool)

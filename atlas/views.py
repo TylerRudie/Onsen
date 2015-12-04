@@ -154,7 +154,7 @@ def edit_event(request, uuid=None):
     else:
 
         form = eventForm(instance=thisEvent)
-        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q( events__hwAssigned__events__evID=thisEvent.evID))
+        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
         print(thisEvent.hwAssigned.all())
         context = {
             "title": title,
