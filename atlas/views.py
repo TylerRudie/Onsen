@@ -128,19 +128,25 @@ def edit_event(request, uuid=None):
         if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
+
+
                 fmList = form.cleaned_data.get('hwAssigned').all()
                 objList = thisEvent.hwAssigned.all()
 
                 for asg_post in fmList:
                     if asg_post not in objList:
-                        hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
-                        hwd_asg.save()
+                        asg = assignment(eventID=fm, hardwareID=asg_post)
+                        asg.save()
 
                 for obj in objList:
                     if obj not in fmList:
-                        obj.delete()
+                        asg_obj = assignment.objects.get(hardwareID=obj, eventID=thisEvent.evID )
+                        asg_obj.delete()
+                        obj.available = True
+                        obj.save()
 
-        print(request.POST)
+
+        # print(request.POST)
         return HttpResponseRedirect(reverse('calendar'))
 
     else:
