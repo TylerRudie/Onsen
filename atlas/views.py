@@ -81,6 +81,7 @@ def all_events(request):
     return HttpResponse(events_to_json(events), content_type='application/json')
 ##TODO add ability to delete events
 
+##TODO error with new and edit event on mobile chrome - 'Uncaught TypeError: Cannot read property 'hasClass' of undefineda.toggleMenu @ app.min.js:1(anonymous function) @ app.min.js:1n.event.dispatch @ jquery.min.js:3r.handle @ jquery.min.js:3'
 @login_required
 def new_event(request):
     title = 'New Event'

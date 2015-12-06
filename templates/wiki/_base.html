@@ -1,0 +1,21 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="span2 well">
+        <p>
+
+        This is from the Wiki Base
+        </p>
+            <ul class="list-group">
+                <a href="{%  url 'help_home' %}" class="list-group-item">Home</a>
+                <a href="{%  url 'help_event' %}" class="list-group-item">Event</a>
+                <a href="{%  url 'help_processing' %}" class="list-group-item">Processing</a>
+                <a href="{%  url 'help_hardware' %}" class="list-group-item">Hardware</a>
+                <a href="{%  url 'help_pool' %}" class="list-group-item">Pool</a>
+                <a href="{%  url 'help_contact' %}" class="list-group-item">Contact</a>
+            </ul>
+    </div>
+
+{% endblock %}
