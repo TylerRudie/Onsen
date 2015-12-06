@@ -320,20 +320,51 @@ def new_hardware(request):
 
 @login_required
 def multiNewHardware(request):
-    title = 'multi New Hardware'
+    title = 'Multi New Hardware'
     form = multiHardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
 
     if request.POST:
-            form = multiHardwareForm(request.POST)
-            print(form)
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
 
+        else:
+            if form.is_valid():
+                data = form.cleaned_data
+                snlist = data['snList'].splitlines()
+                for line in snlist:
+                    hw = hardware(serialNum=line)
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                    if data['desc']:
+                        hw.desc = data['desc']
 
-    return render(request, "hardware/multiHardware.html", context)
+                    if data['config']:
+                        hw.config = data['config']
+
+                    if data['type']:
+                        hw.type = data['type']
+
+                    if data['poolID']:
+                        hw.poolID = data['poolID']
+
+                    hw.save()
+
+                return redirect(reverse('hardware_list'))
+
+            else:
+                context = {
+                "title": title,
+                "form": form
+            }
+
+                return render(request, "hardware/multiHardware.html", context)
+
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "hardware/multiHardware.html", context)
 
 
 @login_required

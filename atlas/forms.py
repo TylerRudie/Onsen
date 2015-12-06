@@ -3,7 +3,7 @@ from .models import event, hardware, contact, airbill, pool
 from bootstrap3_datetime.widgets import DateTimePicker
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
-from crispy_forms.bootstrap import TabHolder, Tab
+from crispy_forms.bootstrap import TabHolder, Tab, AppendedText, PrependedText, FormActions
 from better_filter_widget import BetterFilterWidget
 ## TODO finish filling out form data
 
@@ -85,29 +85,37 @@ class hardwareForm(forms.ModelForm):
         model = hardware
         exclude = ['hwID','available' ]
 
+
 class multiHardwareForm(forms.ModelForm):
-    like_website = forms.CharField( widget=forms.Textarea )
-    favorite_number = forms.CharField()
-    favorite_color = forms.CharField()
-    favorite_food = forms.CharField()
+
+    snList = forms.CharField(widget=forms.Textarea)
+    snList.label = 'List of Serial Numbers'
 
     def __init__(self, *args, **kwargs):
         super(multiHardwareForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Fieldset(
-                'first arg is the legend of the fieldset',
-                'like_website',
+                'Create Multiple New Hardware',
+                'snList',
                 'desc',
                 'config',
                 'type',
-                'poolID'
+                'poolID',
+                FormActions(
+                    Submit('_submit', 'Submit', css_class="btn-primary"),
+                    Submit('_cancel', 'Cancel'),
+                    )
             ),
 
         )
+
+
     class Meta:
         model = hardware
-        exclude = ['hwID', ]
+        exclude = ['hwID','available','serialNum']
+
+
 
 class contactForm(forms.ModelForm):
     class Meta:
