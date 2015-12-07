@@ -61,8 +61,27 @@
             </ul>
         </div>
     </div>
+
+
     <!-- widget grid -->
     <section id="widget-grid" class="">
+
+    <div>
+         <p>
+             This is a Test Data
+            laptop <br>
+             {% for key, value in laptop_usage %}
+                {{ key }} | {{ value }} <br>
+             {% endfor %}
+            projector <br>
+            {% for key, value in projector_usage %}
+                {{ key }} | {{ value }} <br>
+             {% endfor %}
+
+
+         </p>
+
+    </div>
 
         <!-- row -->
         <div class="row">

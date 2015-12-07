@@ -13,7 +13,7 @@ from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
-from .util import get_default_pool
+from .util import get_default_pool, get_hw_staus_stats
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
 # from django_datatables_view.base_datatable_view import BaseDatatableView
@@ -58,7 +58,14 @@ def home_redirect(request):
 
 @login_required
 def home(request):
-    return render(request, "home.html", {})
+
+    context = {
+            "title": 'Home',
+            "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
+            "projector_usage": get_hw_staus_stats(hwType='Test')
+        }
+
+    return render(request, "home.html", context)
 
 ###############################################
 

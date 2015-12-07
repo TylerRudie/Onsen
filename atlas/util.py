@@ -1,4 +1,5 @@
 from datetime import timedelta, date
+from collections import Counter
 import atlas.models
 
 def add_business_days(from_date, number_of_days):
@@ -26,3 +27,7 @@ def get_default_pool():
         return None
 
 
+def get_hw_staus_stats(hwType):
+
+    c = Counter([item.status for item in atlas.models.hardware.objects.filter(type=hwType)])
+    return c.items()
