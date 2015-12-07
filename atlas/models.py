@@ -100,6 +100,7 @@ class hardware(models.Model):
     def __unicode__(self):
         return self.serialNum
 
+    @property
     def status(self):
 
         if self.poolID.retired:
@@ -140,7 +141,7 @@ class hardware(models.Model):
             return 'Transfer From'
 
         else:
-            ## Because i do not beleive the save will catch all of them, this is to catch what it fails
+            ## Because i do not believe the save will catch all of them, this is to catch what it fails
             if self.available is not True:
                 self.available = True
                 self.save()
