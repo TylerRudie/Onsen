@@ -22,7 +22,7 @@
     <div id="logo-group">
 
         <!-- PLACE YOUR LOGO HERE -->
-        <span id="logo"> <img src="{% static 'img/logo-white.png'%}" alt="SmartAdmin"> </span>
+        <span id="logo"> <img src="{% static 'img/logo.png'%}" alt="SIEMENS"> </span>
         <!-- END LOGO PLACEHOLDER -->
     </div>
 
@@ -40,7 +40,7 @@
         <ul id="mobile-profile-img" class="header-dropdown-list hidden-xs padding-5">
             <li class="">
                 <a href="#" class="dropdown-toggle no-margin userdropdown" data-toggle="dropdown">
-                    <img src="{% static 'img/avatars/sunny.png'%}" alt="John Doe" class="online" />
+                    <img src="{% static 'img/avatars/default.png'%}" alt="John Doe" class="online" />
                 </a>
                 <ul class="dropdown-menu pull-right">
                     <li>
@@ -150,11 +150,10 @@
 				<span> <!-- User image size is adjusted inside CSS, it should stay as it -->
 
 					<a href="javascript:void(0);" id="show-shortcut" data-action="toggleShortcut">
-                        <img src="{% static 'img/avatars/sunny.png'%}" alt="me" class="online" />
+                        <img src="{% static 'img/avatars/default.png'%}" alt="me" class="online" />
 						<span>
-							Dante
+							{{ user.get_username }}
 						</span>
-                        <i class="fa fa-angle-down"></i>
                     </a>
 
 				</span>
@@ -168,24 +167,7 @@
                 <a href="/" title="Dashboard"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent">Dashboard</span></a>
             </li>
             <li>
-                <a href="#"><i class="fa fa-lg fa-fw fa-bar-chart-o"></i> <span class="menu-item-parent">Graphs</span></a>
-                <ul>
-                    <li>
-                        <a href="flot.html">Flot Chart</a>
-                    </li>
-                    <li>
-                        <a href="morris.html">Morris Charts</a>
-                    </li>
-                    <li>
-                        <a href="inline-charts.html">Inline Charts</a>
-                    </li>
-                    <li>
-                        <a href="dygraphs.html">Dygraphs</a>
-                    </li>
-                    <li>
-                        <a href="chartjs.html">Chart.js <span class="badge pull-right inbox-badge bg-color-yellow">new</span></a>
-                    </li>
-                </ul>
+                <a href="{% url 'calendar' %}"><i class="fa fa-lg fa-fw fa-calendar"></i> <span class="menu-item-parent">Events</span></a>
             </li>
             <li>
                 <a href="#"><i class="fa fa-lg fa-fw fa-table"></i> <span class="menu-item-parent">Tables</span></a>
@@ -207,58 +189,27 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i> <span class="menu-item-parent">Forms</span></a>
+                <a href="#"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i> <span class="menu-item-parent">Reports</span></a>
                 <ul>
                     <li>
-                        <a href="form-elements.html">Smart Form Elements</a>
+                        <a href="form-elements.html">Inventory Report</a>
                     </li>
                     <li>
-                        <a href="form-templates.html">Smart Form Layouts</a>
-                    </li>
-                    <li>
-                        <a href="validation.html">Smart Form Validation</a>
-                    </li>
-                    <li>
-                        <a href="bootstrap-forms.html">Bootstrap Form Elements</a>
-                    </li>
-                    <li>
-                        <a href="bootstrap-validator.html">Bootstrap Form Validation</a>
-                    </li>
-                    <li>
-                        <a href="plugins.html">Form Plugins</a>
-                    </li>
-                    <li>
-                        <a href="wizard.html">Wizards</a>
-                    </li>
-                    <li>
-                        <a href="other-editors.html">Bootstrap Editors</a>
-                    </li>
-                    <li>
-                        <a href="dropzone.html">Dropzone </a>
-                    </li>
-                    <li>
-                        <a href="image-editor.html">Image Cropping <span class="badge pull-right inbox-badge bg-color-yellow">new</span></a>
+                        <a href="form-templates.html">Turnover Report</a>
                     </li>
                 </ul>
             </li>
-            <li>
-            <li>
-                <a href="{% url 'calendar' %}"><i class="fa fa-lg fa-fw fa-calendar"><em>3</em></i> <span class="menu-item-parent">Calendar</span></a>
-            </li>
             <li class="top-menu-invisible">
-                <a href="#"><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">SmartAdmin Intel</span></a>
+                <a href="#"><i class="fa fa-lg fa-fw fa-cube txt-color-blue"></i> <span class="menu-item-parent">Extras</span></a>
                 <ul>
                     <li>
-                        <a href="difver.html"><i class="fa fa-stack-overflow"></i> Different Versions</a>
+                        <a href="/admin"><i class="fa fa-stack-overflow"></i>Admin Panel</a>
                     </li>
                     <li>
-                        <a href="applayout.html"><i class="fa fa-cube"></i> App Settings</a>
+                        <a href="applayout.html"><i class="fa fa-cube"></i>Contact Support</a>
                     </li>
                     <li>
-                        <a href="http://bootstraphunter.com/smartadmin/BUGTRACK/track_/documentation/index.html" target="_blank"><i class="fa fa-book"></i> Documentation</a>
-                    </li>
-                    <li>
-                        <a href="http://bootstraphunter.com/smartadmin/BUGTRACK/track_/" target="_blank"><i class="fa fa-bug"></i> Bug Tracker</a>
+                        <a href="http://bootstraphunter.com/smartadmin/BUGTRACK/track_/documentation/index.html" target="_blank"><i class="fa fa-book"></i>Documentation</a>
                     </li>
                 </ul>
             </li>
