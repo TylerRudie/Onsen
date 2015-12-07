@@ -17,7 +17,13 @@
  * - BODY
  * - CUSTOM STYLES
  */
-.sblue {
+.sblueheadbtn {
     background: #009999;
-    border: 1px solid #009999;
+    border: 1px solid #0AA699;
+}
+
+.sbluesubbtn {
+    color: #ffffff;
+    background-color:#009999;
+    border-color: #0AA699;
 }
