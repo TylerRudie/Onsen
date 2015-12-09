@@ -22,6 +22,11 @@ from atlas.views import *
 urlpatterns = [
     url(r'^$', 'atlas.views.home', name='home'),
 
+###################
+
+    url(r'^dashboard/',
+        'atlas.views.dashboard',
+        name='dashboard'),
 
 ###################
 
@@ -33,8 +38,6 @@ urlpatterns = [
         'atlas.views.calendar',
         name='calendar'),
 
-
-
     url(r'^events/new/$',
         'atlas.views.new_event',
         name='event_new'),
@@ -43,11 +46,30 @@ urlpatterns = [
         'atlas.views.edit_event',
         name='event_edit'),
 
+     url(r'^events/packing_pdf/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        packing_pdfView.as_view(),
+        name='event_packing_pdf'),
+
+     url(r'^events/srf_pdf/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        srf_pdfView.as_view(),
+        name='event_srf_pdf'),
+
+    url(r'^events/checkin/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        checkin_hardware.as_view(),
+        name='event_checkin'),
+
+    url(r'^events/checkout/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        checkout_hardware.as_view(),
+        name='event_checkout'),
 ###################
 
     url(r'^hardware/new/$',
         'atlas.views.new_hardware',
         name='hardware_new'),
+
+    url(r'^hardware/multi/$',
+        'atlas.views.multiNewHardware',
+        name='hardware_multiNew'),
 
     url(r'^hardware/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
         'atlas.views.edit_hardware',
@@ -98,19 +120,21 @@ urlpatterns = [
     url(r'^pool/list/$',
         list_pool.as_view(),
         name='pool_list'),
+
 ###################
     url(r'^accounts/profile/$',  'atlas.views.home_redirect'),
 
     url(r'^accounts/', include('registration.backends.default.urls')),
+
+    url(r'^help/', include('wiki.urls')),
 
     url(r'^admin/',
         include(admin.site.urls)),
 
     # (r'^notifications/', get_nyt_pattern()),
     # (r'^wiki/$', get_wiki_pattern())
+
 ]
-
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

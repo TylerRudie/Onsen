@@ -41,8 +41,9 @@ INSTALLED_APPS = (
     'crispy_forms',
     'bootstrap3_datetime',
     'registration',
-
-
+    'easy_pdf',
+    'better_filter_widget',
+    'exclusivebooleanfield',
     ## Project
     'fullcalendar',
     'atlas',
@@ -95,8 +96,8 @@ DATABASES = {
         # 'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         # 'PORT': '3306',
 
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -116,8 +117,19 @@ USE_TZ = True
 
 # Atlas Global Settings
 
-TRANS_DAYS = 4
-NUM_PER_PAGE = 2
+TRANS_DAYS = 2
+## todo remove NUM_PER_PAGE after listview is converted to smartadmin
+NUM_PER_PAGE = 10
+
+HARDWARE_TYPES = (
+    ('Laptop','Laptop'),
+    ('Workstation','Workstation'),
+    ('Server', 'Server'),
+    ('Monitor', 'Monitor'),
+    ('Projector', 'Projector'),
+    ('SpaceMouse', 'SpaceMouse'),
+    ('Miscellaneous', 'Miscellaneous'),
+    )
 
 # Crispy Forms Settings
 

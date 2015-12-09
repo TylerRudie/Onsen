@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
-
+from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -9,10 +9,15 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from easy_pdf.views import PDFTemplateView
+from django.core.urlresolvers import reverse
+from django.db.models import Q
 
-from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm
-from .models import event, hardware, contact, airbill, pool
+from .util import get_default_pool, get_hw_staus_stats
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
+from .models import event, hardware, contact, airbill, pool, assignment
 
+## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
@@ -53,13 +58,27 @@ def home_redirect(request):
 
 @login_required
 def home(request):
-    return render(request, "home.html", {})
+
+    context = {
+            "title": 'Home',
+            "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
+            "projector_usage": get_hw_staus_stats(hwType='Test')
+        }
+
+    return render(request, "home.html", context)
+
+###############################################
+
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html", {})
 
 
+###############################################
 @login_required
 def calendar(request):
     event_url = 'all_events/'
-    return render(request, 'events/calendar.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
+    return render(request, 'events/cl.html', {'calendar_config_options': calendar_options(event_url, OPTIONS)})
 # Create your views here.
 
 
@@ -67,26 +86,57 @@ def calendar(request):
 def all_events(request):
     events = event.objects.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
-
-
 ##TODO add ability to delete events
 
+##TODO error with new and edit event on mobile chrome - 'Uncaught TypeError: Cannot read property 'hasClass' of undefineda.toggleMenu @ app.min.js:1(anonymous function) @ app.min.js:1n.event.dispatch @ jquery.min.js:3r.handle @ jquery.min.js:3'
 @login_required
 def new_event(request):
     title = 'New Event'
-    form = eventForm(request.POST or None)
-
+    df = get_default_pool()
+    form = eventForm(request.POST or None, initial={'pool': df,
+                                                    'seat_revenue': df.default_seat_revenue,
+                                                    'projector_revenue': df.default_projector_revenue})
+    form.fields['nextEvent'].queryset = event.objects.none()
+    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
-            form = eventForm(request.POST)
+        form = eventForm(request.POST)
+        if request.POST.get("_cancel"):
+            return redirect(reverse('calendar'))
+        else:
             if form.is_valid():
-                form.save()
+                fm = form.save(commit=False)
+                fm.save()
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                for asg_post in form.cleaned_data.get('hwAssigned'):
+                    hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
 
-    return render(request, "events\event.html", context)
+                    hwd_asg.save()
+
+
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('event_edit', kwargs={'uuid': obj.pk} ))
+
+                else:
+                    return HttpResponseRedirect(reverse('calendar'))
+
+            else:
+                context = {
+                    "title": title,
+                    "form": form
+                }
+
+                return render(request, "events/event.html", context)
+
+
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "events/event.html", context)
 
 
 @login_required
@@ -94,81 +144,126 @@ def edit_event(request, uuid=None):
     title = 'Edit Event'
     if uuid:
         thisEvent = get_object_or_404(event, evID=uuid)
-## TODO fix M2M save 'Cannot set values on a ManyToManyField which specifies an intermediary model.'
-    ## http://stackoverflow.com/questions/387686/what-are-the-steps-to-make-a-modelform-work-with-a-manytomany-relationship-with
-    if request.POST:
-        form = eventForm(request.POST, instance=thisEvent)
-        if form.is_valid():
-            form.save()
-
-    else:
-        form = eventForm(instance=thisEvent)
-
-    print thisEvent
-
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "events\event.html", context)
-
-###############################
-
-@login_required
-def new_hardware(request):
-    title = 'New Hardware'
-    form = hardwareForm(request.POST or None)
 
     if request.POST:
-            form = hardwareForm(request.POST)
+        if request.POST.get("_cancel"):
+            return redirect(reverse('calendar'))
+        else:
+            form = eventForm(request.POST, instance=thisEvent)
+
             if form.is_valid():
-                form.save()
+                fm = form.save(commit=False)
+                fm.save()
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                fmList = form.cleaned_data.get('hwAssigned').all()
+                objList = thisEvent.hwAssigned.all()
 
-    return render(request, "hardware\hardware.html", context)
+                for asg_post in fmList:
+                    if asg_post not in objList:
+                        asg = assignment(eventID=fm, hardwareID=asg_post)
+                        asg.save()
 
+                for obj in objList:
+                    if obj not in fmList:
+                        asg_obj = assignment.objects.get(hardwareID=obj, eventID=thisEvent.evID )
+                        asg_obj.delete()
+                        obj.available = True
+                        obj.save()
+                if request.POST.get("_stay"):
+                    form = eventForm(instance=thisEvent)
+                    form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
+                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                    print(thisEvent.hwAssigned.all())
+                    context = {
+                        "title": title,
+                        "form": form,
+                        "evID": thisEvent.evID
+                    }
+                    return render(request, "events/event.html", context)
 
-@login_required
-def edit_hardware(request, uuid=None):
-    title = 'Edit Hardware'
-    if uuid:
-        thisObj = get_object_or_404(hardware, hwId=uuid)
+                elif request.POST.get("_event_checkout"):
+                    return redirect(reverse('event_checkout', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_checkin"):
+                    return redirect(reverse('event_checkin', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_srf_pdf"):
+                    return redirect(reverse('event_srf_pdf', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_packing_pdf"):
+                    return redirect(reverse('event_packing_pdf', kwargs={'uuid': thisEvent.pk} ))
 
-    if request.POST:
-        form = hardwareForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+                else:
+                    return HttpResponseRedirect(reverse('calendar'))
+            else:
+                form = eventForm(instance=thisEvent)
+                form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
+                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                print(thisEvent.hwAssigned.all())
+                context = {
+                    "title": title,
+                    "form": form,
+                    "evID": thisEvent.evID
+                }
+
+                return render(request, "events/event.html", context)
 
     else:
-        form = hardwareForm(instance=thisObj)
 
-    print thisObj
+        form = eventForm(instance=thisEvent)
+        form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
+        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+        print(thisEvent.hwAssigned.all())
+        context = {
+            "title": title,
+            "form": form,
+            "evID": thisEvent.evID
+        }
+
+        return render(request, "events/event.html", context)
 
 
-    context = {
-        "title": title,
-        "form": form
-    }
+class packing_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_packing.html"
 
-    return render(request, "hardware\hardware.html", context)
+    def get_context_data(self, **kwargs):
+        context = super(packing_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        ev = get_object_or_404(event, evID=uuid)
 
-# @login_required
-class list_hardware(ListView):
+        context["event"] = ev
 
-    model = hardware
-    template_name = 'hardware/hwIndex.html'
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(packing_pdfView, self).dispatch(request, *args, **kwargs)
+
+
+class srf_pdfView(PDFTemplateView):
+    template_name = "pdf/pdf_srf.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(srf_pdfView, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        print uuid
+        ev = get_object_or_404(event, evID=uuid)
+        print ev
+        context["event"] = ev
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(srf_pdfView, self).dispatch(request, *args, **kwargs)
+
+class checkin_hardware(ListView):
+    model = assignment
+    template_name = 'events/checkin_hardware.html'
     paginate_by = settings.NUM_PER_PAGE
+    # success_url = '/'
 
 
     def get_context_data(self, **kwargs):
-        context = super(list_hardware, self).get_context_data(**kwargs)
-        obj_y = hardware.objects.all()
+        context = super(checkin_hardware, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        obj_y = assignment.objects.filter(eventID=uuid)
 
         print obj_y.count()
 
@@ -183,35 +278,272 @@ class list_hardware(ListView):
         except EmptyPage:
             obj_z = paginator.page(paginator.num_pages)
 
-        print obj_z.object_list
+        # print obj_z.object_list
 
         context['page_items'] = obj_z
         return context
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+
+        if request.POST:
+            if request.POST.get("_cancel"):
+                    return redirect(reverse('event_edit', kwargs=self.kwargs))
+            else:
+                if request.POST is not None:
+                    for item in request.POST.getlist('selected_hardware'):
+                        print(item)
+                        print(request.user)
+                        print(timezone.now())
+                        record = assignment.objects.get(asgID=item)
+                        record.inUser = request.user
+                        record.inTimeStamp = timezone.now()
+                        record.save()
+                    if request.POST.get("_stay"):
+                        pass
+                    else:
+                        return redirect(reverse('event_edit', kwargs=self.kwargs))
+
+        return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
+
+class checkout_hardware(ListView):
+    model = assignment
+    template_name = 'events/checkout_hardware.html'
+    paginate_by = settings.NUM_PER_PAGE
+    # success_url = '/'
+
+
+    def get_context_data(self, **kwargs):
+        context = super(checkout_hardware, self).get_context_data(**kwargs)
+        uuid = self.kwargs['uuid']
+        obj_y = assignment.objects.filter(eventID=uuid)
+
+        print obj_y.count()
+
+        paginator = Paginator(obj_y, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            obj_z = paginator.page(page)
+        except PageNotAnInteger:
+            obj_z = paginator.page(1)
+        except EmptyPage:
+            obj_z = paginator.page(paginator.num_pages)
+
+        # print obj_z.object_list
+
+        context['page_items'] = obj_z
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.POST:
+            if request.POST is not None:
+                if request.POST.get("_cancel"):
+                    return redirect(reverse('event_edit', kwargs=self.kwargs))
+                else:
+                    for item in request.POST.getlist('selected_hardware'):
+                        # print(item)
+                        # print(request.user)
+                        # print(timezone.now())
+                        record = assignment.objects.get(asgID=item)
+                        record.outUser = request.user
+                        record.outTimeStamp = timezone.now()
+                        record.save()
+                    if request.POST.get("_stay"):
+                        pass
+                    else:
+                        return redirect(reverse('event_edit', kwargs=self.kwargs))
+
+        return super(checkout_hardware, self).dispatch(request, *args, **kwargs)
+
+
+
+###############################################
+##DONE CCS
+@login_required
+def new_hardware(request):
+    title = 'New Hardware'
+    form = hardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
+
+    if request.POST:
+
+
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
+
+        else:
+            form = hardwareForm(request.POST)
+            if form.is_valid():
+                form.save()
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('hardware_edit', kwargs={'uuid': obj.pk} ))
+
+                else:
+                    return redirect(reverse('hardware_list'))
+
+            else:
+                context = {
+                "title": title,
+                    "form": form
+                }
+
+                return render(request, "hardware/hardware.html", context)
+
+
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "hardware/hardware.html", context)
+
+@login_required
+def multiNewHardware(request):
+    title = 'Multi New Hardware'
+    form = multiHardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
+
+    if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
+
+        else:
+            if form.is_valid():
+                data = form.cleaned_data
+                snlist = data['snList'].splitlines()
+                for line in snlist:
+                    hw = hardware(serialNum=line)
+
+                    if data['desc']:
+                        hw.desc = data['desc']
+
+                    if data['config']:
+                        hw.config = data['config']
+
+                    if data['type']:
+                        hw.type = data['type']
+
+                    if data['poolID']:
+                        hw.poolID = data['poolID']
+
+                    if data['cost']:
+                        hw.cost = data['cost']
+
+                    hw.save()
+
+                return redirect(reverse('hardware_list'))
+
+            else:
+                context = {
+                "title": title,
+                "form": form
+            }
+
+                return render(request, "hardware/multiHardware.html", context)
+
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "hardware/multiHardware.html", context)
+
+##DONE CCS
+@login_required
+def edit_hardware(request, uuid=None):
+    title = 'Edit Hardware'
+    if uuid:
+        thisObj = get_object_or_404(hardware, hwID=uuid)
+
+    if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
+        else:
+            form = hardwareForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "hardware/hardware.html", context)
+
+                else:
+                    return redirect(reverse('hardware_list'))
+
+            else:
+                context = {"title": title,
+                           "form": form}
+
+                return render(request, "hardware/hardware.html", context)
+
+    else:
+        form = hardwareForm(instance=thisObj)
+
+        context = {"title": title,
+                    "form": form}
+
+        return render(request, "hardware/hardware.html", context)
+
+# @login_required
+class list_hardware(ListView):
+
+    model = hardware
+    template_name = 'hardware/hw.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_hardware, self).get_context_data(**kwargs)
+        obj_y = hardware.objects.all()
+
+
+        context['page_items'] = obj_y
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
 
-#############################
-
+###############################################
+## DONE CCS
 @login_required
 def new_contact(request):
     title = 'New Contact'
     form = contactForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('contact_list'))
+        else:
             form = contactForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('contact_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('contact_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "contact/contact.html", context)
 
     context = {
         "title": title,
         "form": form
     }
 
-    return render(request, "contact\contact.html", context)
+    return render(request, "contact/contact.html", context)
 
-
+##DONE CCS
 @login_required
 def edit_contact(request, uuid=None):
     title = 'Edit Contact'
@@ -219,22 +551,32 @@ def edit_contact(request, uuid=None):
         thisObj = get_object_or_404(contact, ctID=uuid)
 
     if request.POST:
-        form = contactForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+        if request.POST.get("_cancel"):
+            return redirect(reverse('contact_list'))
 
+        else:
+            form = contactForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "contact/contact.html", context)
+                else:
+                    return redirect(reverse('contact_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "contact/contact.html", context)
     else:
         form = contactForm(instance=thisObj)
 
-    print thisObj
+        context = {
+            "title": title,
+            "form": form
+        }
 
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "contact\contact.html", context)
+        return render(request, "contact/contact.html", context)
 
 
 ##TODO add title context to view
@@ -242,27 +584,16 @@ def edit_contact(request, uuid=None):
 class list_contact(ListView):
 
     model = contact
-    template_name = 'contact/ctIndex.html'
+    template_name = 'contact/c.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
     def get_context_data(self, **kwargs):
         context = super(list_contact, self).get_context_data(**kwargs)
         obj_y = contact.objects.all()
-        #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
 
-        page = self.request.GET.get('page')
 
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
     @method_decorator(login_required)
@@ -270,25 +601,36 @@ class list_contact(ListView):
         return super(list_contact, self).dispatch(request, *args, **kwargs)
 
 
-#############################
+###############################################
+##DONE CCS
 @login_required
 def new_airbill(request):
     title = 'New Airbill'
     form = airbillForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('airbill_list'))
+        else:
             form = airbillForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                if request.POST.get("_stay"):
+                    return redirect(reverse('airbill_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('airbill_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "airbill/airbill.html", context)
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "airbill/airbill.html", context)
 
-    return render(request, "airbill/airbill.html", context)
-
-
+##DONECCS
 @login_required
 def edit_airbill(request, uuid=None):
     title = 'Edit Airbill'
@@ -296,14 +638,28 @@ def edit_airbill(request, uuid=None):
         thisObj = get_object_or_404(airbill, abID=uuid)
 
     if request.POST:
-        form = airbillForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+        if request.POST.get("_cancel"):
+            return redirect(reverse('airbill_list'))
+
+        else:
+            form = airbillForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                            "form": form}
+                    return render(request, "airbill/airbill.html", context)
+                else:
+                     return redirect(reverse('airbill_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "airbill/airbill.html", context)
 
     else:
         form = airbillForm(instance=thisObj)
 
-    print thisObj
+    # print thisObj
 
 
     context = {
@@ -314,32 +670,31 @@ def edit_airbill(request, uuid=None):
     return render(request, "airbill/airbill.html", context)
 
 
-
 class list_airbill(ListView):
 
     model = airbill
-    template_name = 'airbill/abIndex.html'
+    template_name = 'airbill/ab.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
     def get_context_data(self, **kwargs):
         context = super(list_airbill, self).get_context_data(**kwargs)
         obj_y = airbill.objects.all()
-        #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
+        # #print obj_y.count()
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        #
+        # #print obj_z.object_list
 
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
 
@@ -347,26 +702,39 @@ class list_airbill(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(list_airbill, self).dispatch(request, *args, **kwargs)
 
-###########################
-
+###############################################
+##DONE CCS
 @login_required
 def new_pool(request):
     title = 'New Pool'
     form = poolForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('pool_list'))
+
+        else:
             form = poolForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                if request.POST.get("_stay"):
+                    return redirect(reverse('pool_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('pool_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "pool/pool.html", context)
 
-    return render(request, "airbill/airbill.html", context)
 
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "pool/pool.html", context)
 
+## DONE CCS
 @login_required
 def edit_pool(request, uuid=None):
     title = 'Edit Pool'
@@ -374,28 +742,38 @@ def edit_pool(request, uuid=None):
         thisObj = get_object_or_404(pool, poolID=uuid)
 
     if request.POST:
-        form = poolForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+         if request.POST.get("_cancel"):
+            return redirect(reverse('pool_list'))
+
+
+         else:
+            form = poolForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "pool/pool.html", context)
+                else:
+                    return redirect(reverse('pool_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+            return render(request, "pool/pool.html", context)
+
 
     else:
         form = poolForm(instance=thisObj)
 
-    print thisObj
-
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "airbill/airbill.html", context)
+        context = {"title": title,
+                "form": form}
+        return render(request, "pool/pool.html", context)
 
 
 class list_pool(ListView):
 
     model = pool
-    template_name = 'pool/poolIndex.html'
+    template_name = 'pool/p.html'
     paginate_by = settings.NUM_PER_PAGE
 
 
@@ -403,22 +781,32 @@ class list_pool(ListView):
         context = super(list_pool, self).get_context_data(**kwargs)
         obj_y = pool.objects.all()
         #print obj_y.count()
-        paginator = Paginator(obj_y, self.paginate_by)
+        # paginator = Paginator(obj_y, self.paginate_by)
+        #
+        # page = self.request.GET.get('page')
+        #
+        # try:
+        #     obj_z = paginator.page(page)
+        # except PageNotAnInteger:
+        #     obj_z = paginator.page(1)
+        # except EmptyPage:
+        #     obj_z = paginator.page(paginator.num_pages)
+        #
+        # #print obj_z.object_list
 
-        page = self.request.GET.get('page')
-
-        try:
-            obj_z = paginator.page(page)
-        except PageNotAnInteger:
-            obj_z = paginator.page(1)
-        except EmptyPage:
-            obj_z = paginator.page(paginator.num_pages)
-
-        #print obj_z.object_list
-
-        context['page_items'] = obj_z
+        context['page_items'] = obj_y
         return context
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(list_pool, self).dispatch(request, *args, **kwargs)
+
+
+###############################################
+##TODO Remove Example view and Templates
+
+class HelloPDFView(PDFTemplateView):
+    template_name = "pdf/hello.html"
+
+    def get_context_data(self, **kwargs):
+        self.evID = self.kwargs['evid']

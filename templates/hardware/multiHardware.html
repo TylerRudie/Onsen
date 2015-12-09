@@ -1,0 +1,29 @@
+{%extends 'base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}Hardware - {% endblock %}
+
+{% block style %}
+
+{% endblock %}
+{% block Calendar_Support %}
+{#        <script src="{% static 'js/jquery.min.js' %}"></script>#}
+{#        <link href="{% static 'css/bootstrap.css'%}" rel="stylesheet">#}
+{#        <script src="{% static 'js/bootstrap.min.js'%}"></script>#}
+
+    {{ form.media }}
+{% endblock %}
+ {%  block content %}
+
+         <div class="row">
+            <div class="col-sm-8" >
+                <form method="POST" action="">
+
+                    {% crispy form %}
+
+                </form>
+            </div>
+        </div>
+
+ {% endblock %}
