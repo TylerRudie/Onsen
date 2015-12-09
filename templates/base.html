@@ -60,7 +60,7 @@
                     </li>
                     <li class="divider"></li>
                     <li>
-                        <a href="login.html" class="padding-10 padding-top-5 padding-bottom-5" data-action="userLogout"><i class="fa fa-sign-out fa-lg"></i> <strong><u>L</u>ogout</strong></a>
+                        <a href="{% url 'logout' %}" class="padding-10 padding-top-5 padding-bottom-5" data-action="userLogout"><i class="fa fa-sign-out fa-lg"></i> <strong><u>L</u>ogout</strong></a>
                     </li>
                 </ul>
             </li>
@@ -68,7 +68,7 @@
 
         <!-- logout button -->
         <div id="logout" class="btn-header transparent pull-right">
-            <span> <a href="login.html" title="Sign Out" data-action="userLogout" data-logout-msg="You can improve your security further after logging out by closing this opened browser"><i class="fa fa-sign-out"></i></a> </span>
+            <span> <a href="{% url 'logout' %}" title="Sign Out" data-action="userLogout" data-logout-msg="You can improve your security further after logging out by closing this opened browser"><i class="fa fa-sign-out"></i></a> </span>
         </div>
         <!-- end logout button -->
 
@@ -206,10 +206,10 @@
                         <a href="/admin"><i class="fa fa-stack-overflow"></i>Admin Panel</a>
                     </li>
                     <li>
-                        <a href="applayout.html"><i class="fa fa-cube"></i>Contact Support</a>
+                        <a href="mailto:rudie@gmail.com" target="_top"><i class="fa fa-cube"></i>Contact Support</a>
                     </li>
                     <li>
-                        <a href="http://bootstraphunter.com/smartadmin/BUGTRACK/track_/documentation/index.html" target="_blank"><i class="fa fa-book"></i>Documentation</a>
+                        <a href="help/" target="_blank"><i class="fa fa-book"></i>Documentation</a>
                     </li>
                 </ul>
             </li>

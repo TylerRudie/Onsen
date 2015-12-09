@@ -134,6 +134,9 @@ urlpatterns = [
     # (r'^notifications/', get_nyt_pattern()),
     # (r'^wiki/$', get_wiki_pattern())
 
+    url(r'^logout',
+        'atlas.views.logout', name='logout'
+        ),
 ]
 
 if settings.DEBUG:
