@@ -137,7 +137,7 @@
                           {% for item in page_items %}
                               <tr>
                                 <td>
-                                    {% if  item.hardwareID.status != "Setup" and item.hardwareID.status != "Available" %}
+                                    {% if  item.hardwareID.status == "Setup" %}
                                     <input class="action-select" name="selected_hardware" type="checkbox" value="{{ item.asgID }}">
                                     {% endif %}
                                 </td>
