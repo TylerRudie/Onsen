@@ -92,30 +92,42 @@ def all_events(request):
 @login_required
 def new_event(request):
     title = 'New Event'
-    form = eventForm(request.POST or None, initial={'pool': get_default_pool()})
+    df = get_default_pool()
+    form = eventForm(request.POST or None, initial={'pool': df,
+                                                    'seat_revenue': df.default_seat_revenue,
+                                                    'projector_revenue': df.default_projector_revenue})
     form.fields['nextEvent'].queryset = event.objects.none()
     form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
         form = eventForm(request.POST)
-        form.meta
-        if form.is_valid():
-            fm = form.save(commit=False)
-            fm.save()
-
-            for asg_post in form.cleaned_data.get('hwAssigned'):
-                hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
-
-                hwd_asg.save()
-
-            return HttpResponseRedirect(reverse('calendar'))
-
+        if request.POST.get("_cancel"):
+            return redirect(reverse('calendar'))
         else:
-            context = {
-                "title": title,
-                "form": form
-            }
+            if form.is_valid():
+                fm = form.save(commit=False)
+                fm.save()
 
-            return render(request, "events/event.html", context)
+                for asg_post in form.cleaned_data.get('hwAssigned'):
+                    hwd_asg = assignment(eventID=fm, hardwareID=asg_post)
+
+                    hwd_asg.save()
+
+
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('event_edit', kwargs={'uuid': obj.pk} ))
+
+                else:
+                    return HttpResponseRedirect(reverse('calendar'))
+
+            else:
+                context = {
+                    "title": title,
+                    "form": form
+                }
+
+                return render(request, "events/event.html", context)
 
 
     else:
@@ -134,12 +146,14 @@ def edit_event(request, uuid=None):
         thisEvent = get_object_or_404(event, evID=uuid)
 
     if request.POST:
-        form = eventForm(request.POST, instance=thisEvent)
+        if request.POST.get("_cancel"):
+            return redirect(reverse('calendar'))
+        else:
+            form = eventForm(request.POST, instance=thisEvent)
 
-        if form.is_valid():
+            if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
-
 
                 fmList = form.cleaned_data.get('hwAssigned').all()
                 objList = thisEvent.hwAssigned.all()
@@ -155,10 +169,41 @@ def edit_event(request, uuid=None):
                         asg_obj.delete()
                         obj.available = True
                         obj.save()
+                if request.POST.get("_stay"):
+                    form = eventForm(instance=thisEvent)
+                    form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
+                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                    print(thisEvent.hwAssigned.all())
+                    context = {
+                        "title": title,
+                        "form": form,
+                        "evID": thisEvent.evID
+                    }
+                    return render(request, "events/event.html", context)
 
+                elif request.POST.get("_event_checkout"):
+                    return redirect(reverse('event_checkout', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_checkin"):
+                    return redirect(reverse('event_checkin', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_srf_pdf"):
+                    return redirect(reverse('event_srf_pdf', kwargs={'uuid': thisEvent.pk} ))
+                elif request.POST.get("_event_packing_pdf"):
+                    return redirect(reverse('event_packing_pdf', kwargs={'uuid': thisEvent.pk} ))
 
-        # print(request.POST)
-        return HttpResponseRedirect(reverse('calendar'))
+                else:
+                    return HttpResponseRedirect(reverse('calendar'))
+            else:
+                form = eventForm(instance=thisEvent)
+                form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
+                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                print(thisEvent.hwAssigned.all())
+                context = {
+                    "title": title,
+                    "form": form,
+                    "evID": thisEvent.evID
+                }
+
+                return render(request, "events/event.html", context)
 
     else:
 
@@ -242,18 +287,22 @@ class checkin_hardware(ListView):
     def dispatch(self, request, *args, **kwargs):
 
         if request.POST:
-            if request.POST is not None:
-                for item in request.POST.getlist('selected_hardware'):
-                    print(item)
-                    print(request.user)
-                    print(timezone.now())
-                    record = assignment.objects.get(asgID=item)
-                    record.inUser = request.user
-                    record.inTimeStamp = timezone.now()
-                    record.save()
-
-
-                return redirect(reverse('event_edit', kwargs=self.kwargs))
+            if request.POST.get("_cancel"):
+                    return redirect(reverse('event_edit', kwargs=self.kwargs))
+            else:
+                if request.POST is not None:
+                    for item in request.POST.getlist('selected_hardware'):
+                        print(item)
+                        print(request.user)
+                        print(timezone.now())
+                        record = assignment.objects.get(asgID=item)
+                        record.inUser = request.user
+                        record.inTimeStamp = timezone.now()
+                        record.save()
+                    if request.POST.get("_stay"):
+                        pass
+                    else:
+                        return redirect(reverse('event_edit', kwargs=self.kwargs))
 
         return super(checkin_hardware, self).dispatch(request, *args, **kwargs)
 
@@ -292,40 +341,67 @@ class checkout_hardware(ListView):
 
         if request.POST:
             if request.POST is not None:
-                for item in request.POST.getlist('selected_hardware'):
-                    # print(item)
-                    # print(request.user)
-                    # print(timezone.now())
-                    record = assignment.objects.get(asgID=item)
-                    record.outUser = request.user
-                    record.outTimeStamp = timezone.now()
-                    record.save()
-
-
-                return redirect(reverse('event_edit', kwargs=self.kwargs))
+                if request.POST.get("_cancel"):
+                    return redirect(reverse('event_edit', kwargs=self.kwargs))
+                else:
+                    for item in request.POST.getlist('selected_hardware'):
+                        # print(item)
+                        # print(request.user)
+                        # print(timezone.now())
+                        record = assignment.objects.get(asgID=item)
+                        record.outUser = request.user
+                        record.outTimeStamp = timezone.now()
+                        record.save()
+                    if request.POST.get("_stay"):
+                        pass
+                    else:
+                        return redirect(reverse('event_edit', kwargs=self.kwargs))
 
         return super(checkout_hardware, self).dispatch(request, *args, **kwargs)
 
 
 
 ###############################################
-
+##DONE CCS
 @login_required
 def new_hardware(request):
     title = 'New Hardware'
     form = hardwareForm(request.POST or None, initial={'poolID': get_default_pool()})
 
     if request.POST:
+
+
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
+
+        else:
             form = hardwareForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                if request.POST.get("_stay"):
+                    return redirect(reverse('hardware_edit', kwargs={'uuid': obj.pk} ))
 
-    return render(request, "hardware/hardware.html", context)
+                else:
+                    return redirect(reverse('hardware_list'))
+
+            else:
+                context = {
+                "title": title,
+                    "form": form
+                }
+
+                return render(request, "hardware/hardware.html", context)
+
+
+    else:
+        context = {
+            "title": title,
+            "form": form
+        }
+
+        return render(request, "hardware/hardware.html", context)
 
 @login_required
 def multiNewHardware(request):
@@ -355,6 +431,9 @@ def multiNewHardware(request):
                     if data['poolID']:
                         hw.poolID = data['poolID']
 
+                    if data['cost']:
+                        hw.cost = data['cost']
+
                     hw.save()
 
                 return redirect(reverse('hardware_list'))
@@ -375,7 +454,7 @@ def multiNewHardware(request):
 
         return render(request, "hardware/multiHardware.html", context)
 
-
+##DONE CCS
 @login_required
 def edit_hardware(request, uuid=None):
     title = 'Edit Hardware'
@@ -383,22 +462,34 @@ def edit_hardware(request, uuid=None):
         thisObj = get_object_or_404(hardware, hwID=uuid)
 
     if request.POST:
-        form = hardwareForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+        if request.POST.get("_cancel"):
+            return redirect(reverse('hardware_list'))
+        else:
+            form = hardwareForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "hardware/hardware.html", context)
+
+                else:
+                    return redirect(reverse('hardware_list'))
+
+            else:
+                context = {"title": title,
+                           "form": form}
+
+                return render(request, "hardware/hardware.html", context)
 
     else:
         form = hardwareForm(instance=thisObj)
 
-    print thisObj
+        context = {"title": title,
+                    "form": form}
 
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "hardware/hardware.html", context)
+        return render(request, "hardware/hardware.html", context)
 
 # @login_required
 class list_hardware(ListView):
@@ -421,16 +512,29 @@ class list_hardware(ListView):
         return super(list_hardware, self).dispatch(request, *args, **kwargs)
 
 ###############################################
-
+## DONE CCS
 @login_required
 def new_contact(request):
     title = 'New Contact'
     form = contactForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('contact_list'))
+        else:
             form = contactForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('contact_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('contact_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "contact/contact.html", context)
 
     context = {
         "title": title,
@@ -439,7 +543,7 @@ def new_contact(request):
 
     return render(request, "contact/contact.html", context)
 
-
+##DONE CCS
 @login_required
 def edit_contact(request, uuid=None):
     title = 'Edit Contact'
@@ -447,22 +551,32 @@ def edit_contact(request, uuid=None):
         thisObj = get_object_or_404(contact, ctID=uuid)
 
     if request.POST:
-        form = contactForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+        if request.POST.get("_cancel"):
+            return redirect(reverse('contact_list'))
 
+        else:
+            form = contactForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "contact/contact.html", context)
+                else:
+                    return redirect(reverse('contact_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "contact/contact.html", context)
     else:
         form = contactForm(instance=thisObj)
 
-    print thisObj
+        context = {
+            "title": title,
+            "form": form
+        }
 
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "contact/contact.html", context)
+        return render(request, "contact/contact.html", context)
 
 
 ##TODO add title context to view
@@ -488,24 +602,35 @@ class list_contact(ListView):
 
 
 ###############################################
+##DONE CCS
 @login_required
 def new_airbill(request):
     title = 'New Airbill'
     form = airbillForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('airbill_list'))
+        else:
             form = airbillForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                if request.POST.get("_stay"):
+                    return redirect(reverse('airbill_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('airbill_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "airbill/airbill.html", context)
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "airbill/airbill.html", context)
 
-    return render(request, "airbill/airbill.html", context)
-
-
+##DONECCS
 @login_required
 def edit_airbill(request, uuid=None):
     title = 'Edit Airbill'
@@ -513,9 +638,23 @@ def edit_airbill(request, uuid=None):
         thisObj = get_object_or_404(airbill, abID=uuid)
 
     if request.POST:
-        form = airbillForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+        if request.POST.get("_cancel"):
+            return redirect(reverse('airbill_list'))
+
+        else:
+            form = airbillForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                            "form": form}
+                    return render(request, "airbill/airbill.html", context)
+                else:
+                     return redirect(reverse('airbill_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "airbill/airbill.html", context)
 
     else:
         form = airbillForm(instance=thisObj)
@@ -564,25 +703,38 @@ class list_airbill(ListView):
         return super(list_airbill, self).dispatch(request, *args, **kwargs)
 
 ###############################################
-
+##DONE CCS
 @login_required
 def new_pool(request):
     title = 'New Pool'
     form = poolForm(request.POST or None)
 
     if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('pool_list'))
+
+        else:
             form = poolForm(request.POST)
             if form.is_valid():
                 form.save()
+                obj = form.instance
 
-    context = {
-        "title": title,
-        "form": form
-    }
+                if request.POST.get("_stay"):
+                    return redirect(reverse('pool_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('pool_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "pool/pool.html", context)
 
-    return render(request, "pool/pool.html", context)
 
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "pool/pool.html", context)
 
+## DONE CCS
 @login_required
 def edit_pool(request, uuid=None):
     title = 'Edit Pool'
@@ -590,22 +742,32 @@ def edit_pool(request, uuid=None):
         thisObj = get_object_or_404(pool, poolID=uuid)
 
     if request.POST:
-        form = poolForm(request.POST, instance=thisObj)
-        if form.is_valid():
-            form.save()
+         if request.POST.get("_cancel"):
+            return redirect(reverse('pool_list'))
+
+
+         else:
+            form = poolForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "pool/pool.html", context)
+                else:
+                    return redirect(reverse('pool_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+            return render(request, "pool/pool.html", context)
+
 
     else:
         form = poolForm(instance=thisObj)
 
-    # print thisObj
-
-
-    context = {
-        "title": title,
-        "form": form
-    }
-
-    return render(request, "pool/pool.html", context)
+        context = {"title": title,
+                "form": form}
+        return render(request, "pool/pool.html", context)
 
 
 class list_pool(ListView):

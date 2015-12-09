@@ -151,13 +151,19 @@
                 <form method="POST" action=""> {% csrf_token %}
                     <p>
                         {% if evID %}
-                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkout" uuid=evID %}' " value='Checkout Hardware' />
-                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkin" uuid=evID %}'" value='Checkin Hardware' />
-                        <input class='btn btn-default' onclick="window.open('{% url "event_srf_pdf" uuid=evID %}','_blank')" value='Shipping Request Form' />
-                        <input class='btn btn-default' onclick="window.open('{% url "event_packing_pdf" uuid=evID %}', '_blank')" value='Packing Sheet' />
+{#                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkout" uuid=evID %}' " value='Checkout Hardware' />#}
+{#                        <input class='btn btn-default' onclick="window.location.href='{% url "event_checkin" uuid=evID %}'" value='Checkin Hardware' />#}
+{#                        <input class='btn btn-default' onclick="window.open('{% url "event_srf_pdf" uuid=evID %}','_blank')" value='Shipping Request Form' />#}
+{#                        <input class='btn btn-default' onclick="window.open('{% url "event_packing_pdf" uuid=evID %}', '_blank')" value='Packing Sheet' />#}
+                                        <input type="submit" name="_event_checkout" value="Checkout Hardware" class="btn" >
+                                        <input type="submit" name="_event_checkin" value="Checkin Hardware" class="btn ">
+                                        <input type="submit" name="_event_srf_pdf" value="Shipping Request Form" class="btn">
+                                        <input type="submit" name="_event_packing_pdf" value="Packing Sheet" class="btn">
+                            <hr>
                         {% endif %}
-
-                        <input class='btn sbluesubbtn' type="submit" value="Submit" name="_save">
+                                        <input type="submit" name="_cancel" value="Cancel" class="btn" >
+                                        <input type="submit" name="_stay" value="Continue" class="btn ">
+                                        <input type="submit" name="_submit" value="Save" class="btn btn-primary btn-primary">
                     </p>
                     {% crispy form %}
 

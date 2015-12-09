@@ -24,14 +24,16 @@ class eventForm(forms.ModelForm):
             ),
             Tab(
                 'Shipping',
-
                 'dateShipped',
-                'abAssigned',
-                'caseAssigned'
+                'Shipping_To',
+                'Shipping_From',
+                'caseAssigned',
             ),
             Tab(
                 'Details',
                 'site',
+                'seat_revenue',
+                'projector_revenue',
                 'laptopsRequested',
                 'projectorRequested',
                 'configAssigned',
@@ -81,6 +83,8 @@ class eventForm(forms.ModelForm):
             'caseAssigned': BetterFilterWidget(),
             'abAssigned': BetterFilterWidget(),
             'instructor_contact': BetterFilterWidget(),
+            'Shipping_To': forms.Textarea(),
+            'Shipping_From': forms.Textarea()
         }
         readonly_fields = ['Transition_To_Event']
 
@@ -108,6 +112,7 @@ class multiHardwareForm(forms.ModelForm):
                 'config',
                 'type',
                 'poolID',
+                'cost',
                 FormActions(
                     Submit('_submit', 'Submit', css_class="btn-primary"),
                     Submit('_cancel', 'Cancel'),

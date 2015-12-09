@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import timedelta
@@ -64,6 +64,14 @@ class pool(models.Model):
 
     default = ExclusiveBooleanField()
 
+    default_seat_revenue = models.PositiveIntegerField('Default Seat Revenue',
+                                                        blank=True,
+                                                        null=True,)
+
+    default_projector_revenue = models.PositiveIntegerField('Default Projector Revenue',
+                                                            blank=True,
+                                                            null=True,)
+
     def __unicode__(self):
         return  self.poolName
 ###############################################
@@ -92,6 +100,12 @@ class hardware(models.Model):
     poolID    = models.ForeignKey(pool)
 
     available = models.BooleanField(default=True)
+
+    seat = models.BooleanField(default=False)
+
+    cost = models.PositiveIntegerField('Item Cost',
+                                       blank=True,
+                                       null=True)
 
     class Meta:
             verbose_name = 'Hardware'
@@ -148,10 +162,52 @@ class hardware(models.Model):
 
             return 'Available'
 
+    @property
+    def total_revenue(self):
 
+        if self.type == 'Laptop' or self.type == 'Workstation':
+            rev = assignment.objects.filter(Q(
+                                                hardwareID=self.hwID,
+                                                outUser__isnull=False,
+                                                inUser__isnull=True,
+                                                eventID__end__lte= timezone.now())| Q(
+                                                hardwareID=self.hwID,
+                                                outUser__isnull=False,
+                                                inUser__isnull=False,
+                                                )
+                                        ).aggregate(Sum('eventID__seat_revenue'))
+            if rev['eventID__seat_revenue__sum'] is not None:
+                return rev['eventID__seat_revenue__sum']
 
+            else:
+                return 0
 
+        elif self.type == 'Projector':
+            rev = assignment.objects.filter(Q(
+                                                hardwareID=self.hwID,
+                                                outUser__isnull=False,
+                                                inUser__isnull=True,
+                                                eventID__end__lte= timezone.now())| Q(
+                                                hardwareID=self.hwID,
+                                                outUser__isnull=False,
+                                                inUser__isnull=False,
+                                                )
+                                        ).aggregate(Sum('eventID__projector_revenue'))
+            if rev['eventID__projector_revenue__sum'] is not None:
+                return rev['eventID__projector_revenue__sum']
 
+            else:
+                return 0
+        else:
+            return 0
+
+    @property
+    def last_event(self):
+        le = self.events.latest(field_name='end')
+        if le is None:
+            return ""
+        else:
+            return le
 ###############################################
 
 class case(models.Model):
@@ -276,6 +332,24 @@ class event(models.Model):
 
     limbo = models.BooleanField(default=False)
 
+    seat_revenue = models.PositiveIntegerField('Seat Revenue',
+                                                blank=True,
+                                                null=True,)
+
+    projector_revenue = models.PositiveIntegerField('Projector Revenue',
+                                                    blank=True,
+                                                    null=True,)
+
+    Shipping_To = models.CharField('Airbills To Event',
+                                    max_length=1000,
+                                    blank=True,
+                                    null=True,)
+
+    Shipping_From = models.CharField('Airbills From Event',
+                                    max_length=1000,
+                                    blank=True,
+                                    null=True,)
+
     def __unicode__(self):
         return self.title
 
@@ -285,13 +359,12 @@ class event(models.Model):
             return None
         elif (self.start):
             cfgDays = self.configAssigned.all().aggregate(Sum('days_Conf'))
-            print(cfgDays)
+            # print(cfgDays)
             if cfgDays['days_Conf__sum'] is None:
                 totalDays = settings.TRANS_DAYS
 
             else:
                 totalDays = cfgDays['days_Conf__sum'] + settings.TRANS_DAYS
-
 
             return atlas.util.sub_business_days(self.start, totalDays)
         else:
@@ -328,7 +401,7 @@ class event(models.Model):
                 w = range(self.Transition_to_event().isocalendar()[1],54)
             else:
                 w = range(self.Transition_to_event().isocalendar()[1],self.start.isocalendar()[1]+1)
-            return [item for item in w if item not in self.event_weeks()]
+            return [item for item in w if item not in self.event_weeks]
         else:
             return None
 
@@ -339,7 +412,7 @@ class event(models.Model):
                 w = range(self.end.isocalendar()[1], 54)
             else:
                 w = range(self.end.isocalendar()[1], self.Transition_from_event().isocalendar()[1]+1)
-            return [item for item in w if item not in self.event_weeks()]
+            return [item for item in w if item not in self.event_weeks]
 
 ## TODO setup with reverse URL lookup
     @property

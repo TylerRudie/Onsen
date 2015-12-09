@@ -123,10 +123,21 @@
                                 <thead>
                                 <tr>
                                     <th data-hide="phone">Serial Number</th>
-                                    <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i>Type</th>
-                                    <th data-hide="phone"><i class="fa fa-fw fa-phone text-muted hidden-md hidden-sm hidden-xs"></i>OS</th>
-                                    <th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker txt-color-blue hidden-md hidden-sm hidden-xs"></i>Status</th>
-                                    <th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker txt-color-blue hidden-md hidden-sm hidden-xs"></i>Available</th>
+                                    <th data-class="expand">
+                                        <i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
+                                            </i>Description</th>
+                                    <th data-hide="phone">
+                                        <i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
+                                            </i>Type</th>
+                                    <th data-hide="phone,tablet">
+                                        <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
+                                            </i>Status</th>
+                                    <th data-hide="phone,tablet">
+                                        <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
+                                            </i>Total Revenue</th>
+                                    <th data-hide="phone,tablet">
+                                        <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
+                                            </i>Last Event</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -135,9 +146,18 @@
                                     <td> <a href="{% url 'hardware_edit' uuid=item.hwID%}">{{ item.serialNum }}</a>
                                     </td>
                                     <td>{{ item.desc }}</td>
-                                    <td>{{ item.config }}</td>
+                                    <td>{{ item.type }}</td>
                                     <td>{{ item.status }}</td>
-                                    <td>{{ item.available }}</td>
+                                    <td>${{ item.total_revenue }}</td>
+                                    <td>
+                                        {% if item.last_event == None %}
+                                        {% else %}
+                                            {{ item.last_event }}
+                                        {% endif %}
+
+
+
+                                    </td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

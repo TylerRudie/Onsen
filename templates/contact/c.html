@@ -118,20 +118,31 @@
                             <table id="dt_basic" class="table table-striped table-bordered table-hover" width="100%">
                                 <thead>
                                 <tr>
-                                    <th data-hide="phone">ID</th>
-                                    <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i>Company</th>
-                                    <th data-hide="phone"><i class="fa fa-fw fa-phone text-muted hidden-md hidden-sm hidden-xs"></i>City</th>
-                                    <th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker txt-color-blue hidden-md hidden-sm hidden-xs"></i>State</th>
+                                    <th data-hide="phone">
+                                                Name</th>
+                                    <th data-class="expand">
+                                        <i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs">
+                                            </i>Company</th>
+                                    <th data-hide="phone">
+                                        <i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
+                                            </i>City</th>
+                                    <th data-hide="phone,tablet">
+                                        <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
+                                            </i>State</th>
+                                    <th data-hide="phone,tablet">
+                                        <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
+                                            </i>Email</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for item in page_items %}
                                 <tr>
-                                    <td> <a href="{% url 'contact_edit' uuid=item.ctID %}">{{ item }}</a>
+                                    <td> <a href="{% url 'contact_edit' uuid=item.ctID %}">{{ item.firstName }} {{ item.lastNameName }}</a>
                                     </td>
                                     <td>{{ item.company }}</td>
                                     <td>{{ item.city }}</td>
                                     <td>{{ item.state }}</td>
+                                    <td>{{ item.email }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>
