@@ -126,7 +126,7 @@ urlpatterns = [
 
     url(r'^accounts/', include('registration.backends.default.urls')),
 
-    url(r'help/', include('wiki.urls')),
+    url(r'^help/', include('wiki.urls')),
 
     url(r'^admin/',
         include(admin.site.urls)),

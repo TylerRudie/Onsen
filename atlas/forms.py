@@ -54,6 +54,12 @@ class eventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(eventForm, self).__init__(*args, **kwargs)
 
+    def clean_end(self):
+        start = self.cleaned_data.get('start')
+        end = self.cleaned_data.get('end')
+        if start > end :
+            raise forms.ValidationError("Start Date must be before End Date")
+        return end
 
     class Meta:
         model = event

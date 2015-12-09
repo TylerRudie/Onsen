@@ -16,7 +16,7 @@ from django.db.models import Q
 from .util import get_default_pool, get_hw_staus_stats
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
-# from django_datatables_view.base_datatable_view import BaseDatatableView
+
 ## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
@@ -93,10 +93,11 @@ def all_events(request):
 def new_event(request):
     title = 'New Event'
     form = eventForm(request.POST or None, initial={'pool': get_default_pool()})
+    form.fields['nextEvent'].queryset = event.objects.none()
     form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
         form = eventForm(request.POST)
-
+        form.meta
         if form.is_valid():
             fm = form.save(commit=False)
             fm.save()
@@ -162,6 +163,7 @@ def edit_event(request, uuid=None):
     else:
 
         form = eventForm(instance=thisEvent)
+        form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
         form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
         print(thisEvent.hwAssigned.all())
         context = {

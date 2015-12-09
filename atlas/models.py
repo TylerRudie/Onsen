@@ -311,6 +311,35 @@ class event(models.Model):
 
     Transition_from_event.short_description = 'Transition from Event'
 
+    ##TODO figure out how to deal with year boundary events
+
+    @property
+    def event_weeks(self):
+        if self.start.isocalendar()[1] > self.end.isocalendar()[1]:
+            return range(self.start.isocalendar()[1],54)
+        else:
+            return range(self.start.isocalendar()[1], self.end.isocalendar()[1]+1)
+
+
+    @property
+    def trans_to_weeks(self):
+        if self.Transition_to_event is not None:
+            if self.Transition_to_event().isocalendar()[1] > self.start.isocalendar()[1]:
+                w = range(self.Transition_to_event().isocalendar()[1],54)
+            else:
+                w = range(self.Transition_to_event().isocalendar()[1],self.start.isocalendar()[1]+1)
+            return [item for item in w if item not in self.event_weeks()]
+        else:
+            return None
+
+    @property
+    def trans_from_weeks(self):
+        if self.Transition_from_event is not None:
+            if self.end.isocalendar()[1] > self.Transition_from_event().isocalendar()[1]:
+                w = range(self.end.isocalendar()[1], 54)
+            else:
+                w = range(self.end.isocalendar()[1], self.Transition_from_event().isocalendar()[1]+1)
+            return [item for item in w if item not in self.event_weeks()]
 
 ## TODO setup with reverse URL lookup
     @property

@@ -37,7 +37,7 @@ class EventAdmin(admin.ModelAdmin):
 
     inlines = [ assingmentInline ]
     list_display = ['title', 'start', 'end',  'Transition_to_event', 'Transition_from_event']
-    readonly_fields=['Transition_to_event', 'Transition_from_event', 'url']
+    readonly_fields=['Transition_to_event', 'Transition_from_event', 'url','event_weeks','trans_to_weeks','trans_from_weeks']
     filter_vertical = ('caseAssigned', 'configAssigned','instructor_contact')
     ordering = ['start']
     list_filter = ['start']
