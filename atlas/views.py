@@ -73,6 +73,9 @@ def home(request):
 def dashboard(request):
     return render(request, "dashboard.html", {})
 
+@login_required
+def logout(request):
+    return render(request, "registration/logout.html", {})
 
 ###############################################
 @login_required
