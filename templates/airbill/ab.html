@@ -126,7 +126,7 @@
                                 <tbody>
                                 {% for item in page_items %}
                                 <tr>
-                                    <td> <a href="{% url 'airbill_edit' uuid=item.abID %}">{{ item }}</a>
+                                    <td> {{ item }}
                                     </td>
                                     <td>{{ item.lastStatus }}</td>
                                     <td>{{ item.used  }}</td>
