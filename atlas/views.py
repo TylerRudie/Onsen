@@ -119,9 +119,12 @@ def all_events(request):
 def new_event(request):
     title = 'New Event'
     df = get_default_pool()
-    form = eventForm(request.POST or None, initial={'pool': df,
-                                                    'seat_revenue': df.default_seat_revenue,
-                                                    'projector_revenue': df.default_projector_revenue})
+    if df is None:
+        form = eventForm(request.POST or None)
+    else:
+        form = eventForm(request.POST or None, initial={'pool': df,
+                                                        'seat_revenue': df.default_seat_revenue,
+                                                        'projector_revenue': df.default_projector_revenue})
     form.fields['nextEvent'].queryset = event.objects.none()
     form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
