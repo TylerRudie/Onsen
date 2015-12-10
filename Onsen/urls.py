@@ -126,6 +126,20 @@ urlpatterns = [
         name='pool_list'),
 
 ###################
+    url(r'^config/new/$',
+        'atlas.views.new_config',
+        name='config_new'),
+
+    url(r'^config/edit/(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})/$',
+        'atlas.views.edit_config',
+        name='config_edit'),
+
+    url(r'^config/list/$',
+        list_config.as_view(),
+        name='config_list'),
+
+###################
+
     url(r'^accounts/profile/$',  'atlas.views.home_redirect'),
 
     url(r'^accounts/', include('registration.backends.default.urls')),

@@ -19,6 +19,8 @@ from .models import event, hardware, contact, airbill, pool, assignment
 from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
+from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
 ## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
@@ -827,6 +829,95 @@ class list_pool(ListView):
 
 
 ###############################################
+
+
+@login_required
+def new_config(request):
+    title = 'New Config'
+    form = configForm(request.POST or None)
+
+    if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('config_list'))
+
+        else:
+            form = configForm(request.POST)
+            if form.is_valid():
+                form.save()
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('config_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('config_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "config/config.html", context)
+
+
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "config/config.html", context)
+
+
+@login_required
+def edit_config(request, uuid=None):
+    title = 'Edit Config'
+    if uuid:
+        thisObj = get_object_or_404(configuration, cfgID=uuid)
+
+    if request.POST:
+         if request.POST.get("_cancel"):
+            return redirect(reverse('config_list'))
+
+
+         else:
+            form = configForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "config/config.html", context)
+                else:
+                    return redirect(reverse('config_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+            return render(request, "config/config.html", context)
+
+
+    else:
+        form = configForm(instance=thisObj)
+
+        context = {"title": title,
+                    "form": form}
+        return render(request, "config/config.html", context)
+
+
+class list_config(ListView):
+
+    model = configuration
+    template_name = 'config/cfg.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_config, self).get_context_data(**kwargs)
+        obj_y = configuration.objects.all()
+
+
+        context['page_items'] = obj_y
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_config, self).dispatch(request, *args, **kwargs)
+
+
+##############################################
 ##TODO Remove Example view and Templates
 
 class HelloPDFView(PDFTemplateView):

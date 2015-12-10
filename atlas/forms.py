@@ -1,5 +1,5 @@
 from django import forms
-from .models import event, hardware, contact, airbill, pool
+from .models import event, hardware, contact, airbill, pool, configuration
 from bootstrap3_datetime.widgets import DateTimePicker
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
@@ -129,6 +129,32 @@ class multiHardwareForm(forms.ModelForm):
 
 
 class contactForm(forms.ModelForm):
+    helper = FormHelper()
+    helper.form_tag = False
+    helper.layout = Layout(
+        TabHolder(
+            Tab(
+                'Basic Information',
+                'firstName',
+                'lastName',
+                'phone',
+                'email',
+                'company',
+
+            ),
+            Tab(
+                'Shipping Address',
+                'address1',
+                'address2',
+                'city',
+                'state',
+                'zip',
+            ),
+        )
+    )
+    def __init__(self, *args, **kwargs):
+        super(contactForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = contact
         exclude = ['cdID', ]
@@ -143,3 +169,8 @@ class poolForm(forms.ModelForm):
     class Meta:
         model = pool
         exclude = ['poolID', ]
+
+class configForm(forms.ModelForm):
+    class Meta:
+        model = configuration
+        exclude = ['cfgID', ]
