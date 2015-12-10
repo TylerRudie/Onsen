@@ -14,11 +14,11 @@ from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from .util import get_default_pool, get_hw_staus_stats
-from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
-from .models import event, hardware, contact, airbill, pool, assignment
+
 from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
