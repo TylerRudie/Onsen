@@ -116,7 +116,7 @@ class hardware(models.Model):
             verbose_name_plural = 'Hardware'
 
     def __unicode__(self):
-        return self.serialNum
+        return self.serialNum + ' [' +self.desc + ']'
 
     @property
     def status(self):

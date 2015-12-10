@@ -31,3 +31,8 @@ def get_hw_staus_stats(hwType):
 
     c = Counter([item.status for item in atlas.models.hardware.objects.filter(type=hwType)])
     return c.items()
+
+def get_hw_staus_stats2():
+
+    c = Counter([item.status for item in atlas.models.hardware.objects.all()])
+    return c.items()
