@@ -18,13 +18,17 @@ class contact(models.Model):
     ctID      = models.UUIDField(primary_key=True,
                                  default=uuid.uuid4,
                                  editable=False)
-    firstName = models.CharField(max_length=100,
+    firstName = models.CharField('First Name',
+                                max_length=100,
                                  )
-    lastName  = models.CharField(max_length=100,
+    lastName  = models.CharField('Last Name',
+                                max_length=100,
                                  )
-    address1  = models.CharField(max_length=100,
+    address1  = models.CharField('Address 1',
+                                max_length=100,
                                  blank=True)
-    address2  = models.CharField(max_length=100,
+    address2  = models.CharField('Address 2',
+                                max_length=100,
                                  blank=True)
     city      = models.CharField(max_length=100,
                                  blank=True)
@@ -246,18 +250,20 @@ class configuration (models.Model):
                                 default=uuid.uuid4,
                                 editable=False)
 
-    cfg_name =  models.CharField('Title',
+    cfg_name =  models.CharField('Name',
                                 blank=True,
                                 max_length=200)
 
-    days_Conf = models.IntegerField(blank=True,
+    days_Conf = models.IntegerField('Additional Days',
+                                    blank=True,
                                     validators=[MinValueValidator(0)],
                                     null=True
                                     )
-    not_load = models.BooleanField(default=False)
+    not_load = models.BooleanField('Scheduling',
+                                   default=False)
 
     def __unicode__(self):
-        return self.cfg_name
+        return self.cfg_name + '<' + self.days_Conf.__str__() +'>'
 ###############################################
 
 

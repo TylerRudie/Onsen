@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -12,10 +13,14 @@ from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-
 from .util import get_default_pool, get_hw_staus_stats
-from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
-from .models import event, hardware, contact, airbill, pool, assignment
+
+from django.forms.models import model_to_dict
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
+
+from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
+from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
 ## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
@@ -64,8 +69,26 @@ def home(request):
             "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
             "projector_usage": get_hw_staus_stats(hwType='Test')
         }
-
     return render(request, "home.html", context)
+
+def draw_graph(request, x="None"):
+    total = hardware.objects.filter(type=x).count()
+    inuse = hardware.objects.filter(type=x).filter(available=1).count()
+    percent = (inuse/total)*100
+
+    graph_data = []
+
+    avail_data = {}
+    avail_data["value"] = percent
+    avail_data["label"] =  x+"(s)"" Available"
+    graph_data.append(avail_data)
+
+    unavail_data = {}
+    unavail_data["value"] = percent-100
+    unavail_data["label"] =  x+"(s)"+" Unavailable"
+    graph_data.append(unavail_data)
+
+    return JsonResponse(graph_data,safe=False)
 
 ###############################################
 
@@ -96,9 +119,12 @@ def all_events(request):
 def new_event(request):
     title = 'New Event'
     df = get_default_pool()
-    form = eventForm(request.POST or None, initial={'pool': df,
-                                                    'seat_revenue': df.default_seat_revenue,
-                                                    'projector_revenue': df.default_projector_revenue})
+    if df is None:
+        form = eventForm(request.POST or None)
+    else:
+        form = eventForm(request.POST or None, initial={'pool': df,
+                                                        'seat_revenue': df.default_seat_revenue,
+                                                        'projector_revenue': df.default_projector_revenue})
     form.fields['nextEvent'].queryset = event.objects.none()
     form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
     if request.POST:
@@ -806,6 +832,95 @@ class list_pool(ListView):
 
 
 ###############################################
+
+
+@login_required
+def new_config(request):
+    title = 'New Config'
+    form = configForm(request.POST or None)
+
+    if request.POST:
+        if request.POST.get("_cancel"):
+            return redirect(reverse('config_list'))
+
+        else:
+            form = configForm(request.POST)
+            if form.is_valid():
+                form.save()
+                obj = form.instance
+
+                if request.POST.get("_stay"):
+                    return redirect(reverse('config_edit', kwargs={'uuid': obj.pk} ))
+                else:
+                    return redirect(reverse('config_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+                return render(request, "config/config.html", context)
+
+
+    else:
+        context = {"title": title,
+                    "form": form}
+        return render(request, "config/config.html", context)
+
+
+@login_required
+def edit_config(request, uuid=None):
+    title = 'Edit Config'
+    if uuid:
+        thisObj = get_object_or_404(configuration, cfgID=uuid)
+
+    if request.POST:
+         if request.POST.get("_cancel"):
+            return redirect(reverse('config_list'))
+
+
+         else:
+            form = configForm(request.POST, instance=thisObj)
+            if form.is_valid():
+                form.save()
+                if request.POST.get("_stay"):
+                    context = {"title": title,
+                                "form": form}
+                    return render(request, "config/config.html", context)
+                else:
+                    return redirect(reverse('config_list'))
+            else:
+                context = {"title": title,
+                            "form": form}
+            return render(request, "config/config.html", context)
+
+
+    else:
+        form = configForm(instance=thisObj)
+
+        context = {"title": title,
+                    "form": form}
+        return render(request, "config/config.html", context)
+
+
+class list_config(ListView):
+
+    model = configuration
+    template_name = 'config/cfg.html'
+    paginate_by = settings.NUM_PER_PAGE
+
+
+    def get_context_data(self, **kwargs):
+        context = super(list_config, self).get_context_data(**kwargs)
+        obj_y = configuration.objects.all()
+
+
+        context['page_items'] = obj_y
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(list_config, self).dispatch(request, *args, **kwargs)
+
+
+##############################################
 ##TODO Remove Example view and Templates
 
 class HelloPDFView(PDFTemplateView):
