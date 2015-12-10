@@ -27,3 +27,9 @@
     background-color:#009999;
     border-color: #0AA699;
 }
+
+#donuts{ width:100%; white-space:nowrap; }
+#donuts div{ display:inline-block; width:33.3%;}
+#donut_graph1{ text-align:left; }
+#donut_graph2{ text-align:center; }
+#donut_graph3{ text-align:right; }

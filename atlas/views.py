@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -12,10 +13,12 @@ from django.utils.decorators import method_decorator
 from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-
 from .util import get_default_pool, get_hw_staus_stats
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm
 from .models import event, hardware, contact, airbill, pool, assignment
+from django.forms.models import model_to_dict
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
 
 ## TODO Setup reverse on all submit views
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
@@ -64,8 +67,26 @@ def home(request):
             "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
             "projector_usage": get_hw_staus_stats(hwType='Test')
         }
-
     return render(request, "home.html", context)
+
+def draw_graph(request, x="None"):
+    total = hardware.objects.filter(type=x).count()
+    inuse = hardware.objects.filter(type=x).filter(available=1).count()
+    percent = (inuse/total)*100
+
+    graph_data = []
+
+    avail_data = {}
+    avail_data["value"] = percent
+    avail_data["label"] =  x+"(s)"" Available"
+    graph_data.append(avail_data)
+
+    unavail_data = {}
+    unavail_data["value"] = percent-100
+    unavail_data["label"] =  x+"(s)"+" Unavailable"
+    graph_data.append(unavail_data)
+
+    return JsonResponse(graph_data,safe=False)
 
 ###############################################
 

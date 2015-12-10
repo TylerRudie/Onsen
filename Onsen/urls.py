@@ -28,6 +28,10 @@ urlpatterns = [
         'atlas.views.dashboard',
         name='dashboard'),
 
+        url(r'^graph/draw_graph/(?P<x>\w+)/$',
+        'atlas.views.draw_graph',
+        name='draw_graph'),
+
 ###################
 
     url(r'^events/calendar/all_events/',
