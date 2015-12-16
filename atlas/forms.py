@@ -92,7 +92,7 @@ class hardwareForm(forms.ModelForm):
 
     class Meta:
         model = hardware
-        exclude = ['hwID','available' ]
+        exclude = ['hwID','available', 'seat' ]
 
 
 class multiHardwareForm(forms.ModelForm):
@@ -123,7 +123,7 @@ class multiHardwareForm(forms.ModelForm):
 
     class Meta:
         model = hardware
-        exclude = ['hwID','available','serialNum']
+        exclude = ['hwID','available','serialNum','seat']
 
 
 

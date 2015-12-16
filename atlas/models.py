@@ -263,7 +263,7 @@ class configuration (models.Model):
                                    default=False)
 
     def __unicode__(self):
-        return self.cfg_name + '< ' + self.days_Conf.__str__() +' >'
+        return self.cfg_name + ' < ' + self.days_Conf.__str__() +' >'
 ###############################################
 
 
@@ -281,7 +281,7 @@ class event(models.Model):
     end     = models.DateTimeField('End')
 
     all_day = models.BooleanField('All day',
-                                  default=False)
+                                  default=True)
 
     laptopsRequested = models.IntegerField( 'Laptops Requested',
                                             blank=True,
@@ -321,11 +321,12 @@ class event(models.Model):
                                         verbose_name='Assigned Airbills')
 
     caseAssigned = models.ManyToManyField(case,
-                                          blank=True)
+                                          blank=True,
+                                          verbose_name='Shipping Cases')
 
     configAssigned = models.ManyToManyField(configuration,
                                             blank=True,
-                                            verbose_name='Configuration')
+                                            verbose_name='Configuration',)
 
     site = models.CharField(max_length=200,
                             blank=True)
