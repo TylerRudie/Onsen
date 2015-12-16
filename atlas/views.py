@@ -126,7 +126,7 @@ def new_event(request):
                                                         'seat_revenue': df.default_seat_revenue,
                                                         'projector_revenue': df.default_projector_revenue})
     form.fields['nextEvent'].queryset = event.objects.none()
-    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
+    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True, poolID__retired=False)
     if request.POST:
         form = eventForm(request.POST)
         if request.POST.get("_cancel"):
@@ -201,7 +201,7 @@ def edit_event(request, uuid=None):
                 if request.POST.get("_stay"):
                     form = eventForm(instance=thisEvent)
                     form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
                     print(thisEvent.hwAssigned.all())
                     context = {
                         "title": title,
@@ -224,7 +224,7 @@ def edit_event(request, uuid=None):
             else:
                 form = eventForm(instance=thisEvent)
                 form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
                 print(thisEvent.hwAssigned.all())
                 context = {
                     "title": title,
@@ -238,7 +238,7 @@ def edit_event(request, uuid=None):
 
         form = eventForm(instance=thisEvent)
         form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
         print(thisEvent.hwAssigned.all())
         context = {
             "title": title,
