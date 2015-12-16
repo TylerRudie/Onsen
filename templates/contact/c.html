@@ -137,7 +137,7 @@
                                 <tbody>
                                 {% for item in page_items %}
                                 <tr>
-                                    <td> <a href="{% url 'contact_edit' uuid=item.ctID %}">{{ item.firstName }} {{ item.lastNameName }}</a>
+                                    <td> <a href="{% url 'contact_edit' uuid=item.ctID %}">{{ item.firstName }} {{ item.lastName }}</a>
                                     </td>
                                     <td>{{ item.company }}</td>
                                     <td>{{ item.city }}</td>

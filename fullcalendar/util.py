@@ -48,6 +48,7 @@ def events_to_json(events_queryset):
     """
     # events_values = list(events_queryset.values( 'title', 'start', 'end', 'all_day', 'url'))
     events_values = list([ { 'title': x.title, 'start': x.start, 'end': x.end, 'all_day': x.all_day, 'url': x.url} for x in events_queryset])
+
     events_values = convert_field_names(events_values)
     return json.dumps(events_values, default=date_handler)
 

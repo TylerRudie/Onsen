@@ -31,7 +31,6 @@ class eventForm(forms.ModelForm):
             ),
             Tab(
                 'Details',
-                'site',
                 'seat_revenue',
                 'projector_revenue',
                 'laptopsRequested',

@@ -263,7 +263,7 @@ class configuration (models.Model):
                                    default=False)
 
     def __unicode__(self):
-        return self.cfg_name + '<' + self.days_Conf.__str__() +'>'
+        return self.cfg_name + '< ' + self.days_Conf.__str__() +' >'
 ###############################################
 
 
@@ -283,11 +283,13 @@ class event(models.Model):
     all_day = models.BooleanField('All day',
                                   default=False)
 
-    laptopsRequested = models.IntegerField(blank=True,
+    laptopsRequested = models.IntegerField( 'Laptops Requested',
+                                            blank=True,
                                             validators=[MinValueValidator(0)],
                                             null=True)
 
-    projectorRequested = models.BooleanField(default=False)
+    projectorRequested = models.BooleanField('Projector Requested',
+                                            default=False)
 
     dateShipped = models.DateField('Date Shipped',
                                    blank=True,
@@ -322,7 +324,8 @@ class event(models.Model):
                                           blank=True)
 
     configAssigned = models.ManyToManyField(configuration,
-                                            blank=True)
+                                            blank=True,
+                                            verbose_name='Configuration')
 
     site = models.CharField(max_length=200,
                             blank=True)
