@@ -44,6 +44,7 @@ class contact(models.Model):
 
     def __unicode__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
+
 ###############################################
 
 class pool(models.Model):
@@ -78,6 +79,7 @@ class pool(models.Model):
 
     def __unicode__(self):
         return  self.poolName
+
 ###############################################
 
 class hardware(models.Model):
@@ -212,6 +214,7 @@ class hardware(models.Model):
             return ""
         else:
             return le
+
 ###############################################
 
 class case(models.Model):
@@ -226,9 +229,7 @@ class case(models.Model):
         return self.caseName
         ordering = ['caseName']
 
-
 ###############################################
-
 
 class airbill(models.Model):
 
@@ -246,6 +247,7 @@ class airbill(models.Model):
 
     def __unicode__(self):
         return self.tracking
+
 ###############################################
 
 class configuration (models.Model):
@@ -267,8 +269,8 @@ class configuration (models.Model):
 
     def __unicode__(self):
         return self.cfg_name + ' < ' + self.days_Conf.__str__() +' >'
-###############################################
 
+###############################################
 
 class event(models.Model):
 
@@ -438,8 +440,6 @@ class event(models.Model):
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
 
-
-
 ###############################################
 
 class event_airbill(models.Model):
@@ -454,6 +454,7 @@ class event_airbill(models.Model):
     class meta:
         verbose_name = 'Assigned Airbill'
 
+###############################################
 
 class assignment(models.Model):
 

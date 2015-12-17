@@ -1,0 +1,96 @@
+{% extends "pdf/pdf_base.html" %}
+{% load staticfiles %}
+{% block layout_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+        @page {
+            size: {{ pagesize|default:"Letter" }};
+            margin-left: 5mm;
+            margin-right: 5mm;
+            margin-top: 5mm;
+            margin-bottom: 5mm;
+                @frame header {
+                    -pdf-frame-content: page-header;
+                    margin-top: 5mm;
+                    margin-right: 5mm;
+                    margin-bottom: 5mm;
+                    margin-left: 1.2cm;
+                    }
+            }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+ <style type="text/css">
+        @font-face { font-family: Lato; src: url(fonts/Lato-Bol.ttf); font-weight: bold; }
+        @font-face { font-family: Lato; src: url(fonts/Lato-Reg.ttf); }
+        @font-face { font-family: "Lato Light"; src: url(fonts/Lato-Lig.ttf); }
+        html {
+            font-family: "Lato", "Helvetica", "sans-serif";
+            color: #333333;
+        }
+        p {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            font-family: "Lato", "Helvetica", "sans-serif";
+        }
+
+{#     .header { color: #7f7f7f;  }#}
+{#     .header p { font-size: 13px; line-height: 1.5em; }#}
+{#     .logo { margin-left: 20px; width: 400px; padding-bottom: -20px;  }#}
+{#     .logo img { zoom: 80%; }#}
+{#     .main { margin-top: .5cm; padding-top: -10px;}#}
+{#     .event-info { border-bottom-style: solid; border-bottom-width: 1px;}#}
+{#     .requests { border-bottom-style: solid; border-bottom-width: 1px;  }#}
+{#     .shipping { border-bottom-style: solid; border-bottom-width: 1px; }#}
+     .main h1 { font-size: 20px; }
+     .table, th, td { border: 1px solid black; border-collapse: collapse; text-align: center; padding-top: 2px}
+{#     th, td { border: 1px solid black; border-collapse: collapse; white-space: pre-wrap; }#}
+{#     colgroup { margin-top: 0px; }#}
+{#     .asset-table { font-size: 12px; }#}
+{#     .asset-table th { padding-top: 5px; text-align: center; }#}
+{#     .asset-table td { padding-left: 20px; padding-top: 5px;  }#}
+{#     .case-table { font-size: 12px; }#}
+{#     .case-table th { padding-top: 5px; text-align: center; }#}
+{#     .case-table td { padding-left: 20px; padding-top: 5px; }#}
+</style>
+{% endblock %}
+
+{%block page_header%}
+<div id="page-header">
+    <h1 style="text-align: center">Mobile Event(s) Information Sheet</h1>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="main">
+        <div >
+            <h1 style="text-align: center"> {{ event.title }} </h1>
+            <br>
+            <p>
+            Contact:   {{ event.shipping_contact.firstName }} {{ event.shipping_contact.lastName }}
+                        ( {{ event.shipping_contact.company }} ) {{ event.shipping_contact.phone }}<br>
+            Instructor: {% for inst in event.instructor_contact.all %}
+                            {{ inst.firstName }} {{ inst.lastName }},
+                        {% endfor %}
+            </p>
+            <table>
+                <tr>
+                    <th> Event Dates </th>
+                    <th> Event </th>
+                    <th> Site of Event </th>
+                    <th> Laptops Requested </th>
+                    <th> Projector </th>
+                    <th> Number of Item </th>
+                    <th> Date Shipped </th>
+                </tr>
+                <tr>
+                    <td>
+                    {{ event.start | date:"m/d" }} - {{ event.end | date:"m/d/Y"  }}
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+{% endblock %}

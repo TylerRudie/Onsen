@@ -22,7 +22,7 @@ from django.http import JsonResponse
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
-## TODO Setup reverse on all submit views
+
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
@@ -229,6 +229,27 @@ def edit_event(request, uuid=None):
                         print(obj)
                         thisEvent.caseAssigned.remove(obj)
 #############################
+                fmList_F = form.cleaned_data.get('configAssigned').all()
+                objList_F = thisEvent.configAssigned.all()
+
+                # print objList_d
+                # print fmList_d
+
+                for asg_post in fmList_F:
+                    if asg_post not in objList_F:
+                        thisEvent.configAssigned.add(asg_post)
+
+                for obj in objList_F:
+                    if obj not in fmList_F:
+                        print(obj)
+                        thisEvent.configAssigned.remove(obj)
+#############################
+
+
+
+
+
+
                 if request.POST.get("_stay"):
                     form = eventForm(instance=thisEvent)
                     form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
@@ -281,7 +302,7 @@ def edit_event(request, uuid=None):
 
 
 class packing_pdfView(PDFTemplateView):
-    template_name = "pdf/pdf_packing.html"
+    template_name = "pdf/pdf_packing_rudie.html"
 
     def get_context_data(self, **kwargs):
         context = super(packing_pdfView, self).get_context_data(**kwargs)
