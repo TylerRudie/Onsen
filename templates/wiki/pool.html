@@ -5,14 +5,29 @@
     {{ block.super }}
 {#    ## Insert HTML Fragment Starting Here###}
     <div class="span2 well">
-        <p>
+        <h1>
 
-        This is from the Wiki pool
-
-
-
-        </p>
-    </div>
+        Pools</h1>
+        <p>Pools are used to  divide hardware based on its availability. Initially, all hardware is added to the &quot;Default Pool&quot; which  marks the hardware as available in the system so it can be selected during  event creation. Additional pools can be created to group hardware that has been  damaged, lost, retired, or set aside for internal use.  Setting the hardware in <strong>Inventory</strong> with any pool other than Default will prevent that  hardware from being checked out to an event.</p>
+      <p>On the left side  menu, click on <strong>Tables</strong> then click on <strong>Pool </strong>to see  list of pools currently in the system.  From this page, you can add new pools or edit  existing pools.</p>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/pool.PNG" width="1243" height="278" /></p>
+      <p>&nbsp;</p>
+      <h2><strong>Creating a new Pool</strong></h2>
+      <p>To  create a new pool:</p>
+      <ul>
+        <li>
+          <p>Click on <strong>Tables</strong> then click on <strong>Pools.</strong></p>
+        </li>
+        <li>
+          <p>Click on <strong>Add Pool</strong> button.</p>
+        </li>
+        <li>
+          <p>New page will open  with fields for information related to the Pool.</p>
+        </li>
+      </ul>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/pool_add.PNG" width="1118" height="510" /></p>
+      <p>&nbsp;</p>
+</div>
 {#     ## Insert HTML Fragment ending Here###}
 
 {% endblock %}

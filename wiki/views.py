@@ -25,3 +25,6 @@ def help_pool(request):
 @login_required
 def help_contact(request):
     return render(request, "wiki/contact.html")
+
+def help_admin(request):
+    return render(request, "wiki/admin.html")

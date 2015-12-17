@@ -1,0 +1,95 @@
+{%extends 'wiki\_base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    {{ block.super }}
+{#    ## Insert HTML Fragment Starting Here###}
+    <div class="span2 well">
+        <h1>Admin Panel</h1>
+      <p>&nbsp;</p>
+      <p>Admin panel provides  additional functionalities and advanced features that are not available in the  main interface.  Some of these functions  include the ability to delete contacts, events, hardware assignments,  configurations, and pools.  Additionally,  the Admin Panel allows the user to create or delete groups and users that  access the system.  These functions are  not available in the main interface for security reasons.</p>
+      <p><br />
+      The Admin Panel can  be accessed quickly from main interface by clicking on <strong>Extras </strong>and then <strong>Admin Panel.</strong></p>
+      <p><br />
+      It can also be  accessed directly via following link: http://onsen.tech-res.net/admin.<br />
+      To log in for the  first time, you can use user <strong>admin</strong> and password <strong>system32</strong><br />
+      </p>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/admin_panel.PNG" width="1147" height="853" /></p>
+      <p>&nbsp;</p>
+      <h2><strong>Users and Groups</strong></h2>
+      <p>The Admin Panel  allows you to create additional users and user groups which will have access to  the system.  Groups make it easier to  manage user permissions for multiple users so they do not have to be specified  individually.</p>
+      <p>&nbsp;</p>
+      <h2><strong>Creating Groups</strong></h2>
+      <p>To create a new group  in Admin Panel: </p>
+      <ul>
+        <li>
+          <p>Click  on <strong>Groups</strong> link located under  &quot;Authentication and Authorization&quot; section.</p>
+        </li>
+        <li>
+          <p>        This will open up a  new page and display a list of groups currently in the system
+          </p>
+        </li>
+      </ul>
+      <p>&nbsp;</p>
+<p><img src="http://onsen.tech-res.net/static/img/wiki/groups.PNG" width="1166" height="324" /></p>
+<ul>
+  <li>
+    <p>Click  on <strong>Add Group</strong></p>
+  </li>
+  <li>
+    <p>  New page opens where  you can enter the name for new group and select permissions which will be  applied to users belonging to this group
+      </p>
+  </li>
+  </ul>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2><strong>Creating  a new user</strong></h2>
+<p><br />
+  To create a new users  that will have access to the system:</p>
+<ul>
+  <li>
+    <p>Click  on <strong>Users</strong> link under  &quot;Authorization and Authentication&quot; section.</p>
+  </li>
+  <li>
+    <p>  New page will open  and display a list of all the users currently in the system.</p>
+  </li>
+</ul>
+<p><img src="http://onsen.tech-res.net/static/img/wiki/usrs.PNG" width="1147" height="417" /></p>
+<ul>
+  <li>
+    <p>Click <strong>Create User</strong> button.</p>
+  </li>
+  <li>
+    <p>  On the next page,  enter username for the new user as well as password.</p>
+  </li>
+  </ul>
+<p><img src="http://onsen.tech-res.net/static/img/wiki/user_add.PNG" width="1147" height="417" /></p>
+<ul>
+  <li>
+    <p>Click <strong>Save</strong> to save the information and  continue.</p>
+    </li>
+  <li>    
+    <p>  New page will open  which allows you to add the user to a group or assign special    </p>
+  </li>
+  <li>
+    <p>On  this page you can enter the user's first and last name as well as email  address.  When creating a new user it is  important to make sure the option under <strong>Permissions</strong> section &quot;Active&quot; is selected, otherwise the user will be created as  inactive user.</p>
+  </li>
+
+    <li>    
+      <p>If  you would like this user to be able to log in to the Admin Panel, you can  select <strong>Staff Status</strong> option.  If you would like to set this user up with  all the permissions, check the <strong>Superuser  Status</strong> option.  NOTE: Giving a user  Superuser permissions will allow them unlimited access to the system.  </p>
+    </li>
+  <li>
+    <p>From  the Available Groups you can select the group(s) you wish to add this user  to.  This will automatically give the  user same permissions that are assigned to that group.</p>
+  </li>
+  <li>
+    <p>Additional  or individual permissions can also be added under User Permissions.</p>
+  </li>
+  <li>
+    <p>Click <strong>Save</strong> button to save all the  information and create the new user.</p>
+  </li>
+</ul>
+<p>&nbsp;</p>
+</div>
+{#     ## Insert HTML Fragment ending Here###}
+
+{% endblock %}

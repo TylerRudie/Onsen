@@ -27,4 +27,8 @@ urlpatterns = [
     url(r'^contact/$',
         'wiki.views.help_contact',
         name='help_contact'),
+
+    url(r'^admin/$',
+        'wiki.views.help_admin',
+        name='help_admin'),
 ]
