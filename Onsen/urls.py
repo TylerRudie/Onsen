@@ -32,6 +32,9 @@ urlpatterns = [
         'atlas.views.draw_graph',
         name='draw_graph'),
 
+        url(r'^map/get_geo/',
+        'atlas.views.get_geo',name='get_geo'),
+
 ###################
 
     url(r'^events/calendar/all_events/',
