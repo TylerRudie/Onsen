@@ -183,7 +183,7 @@ def edit_event(request, uuid=None):
             if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
-
+################################
                 fmList = form.cleaned_data.get('hwAssigned').all()
                 objList = thisEvent.hwAssigned.all()
 
@@ -198,6 +198,37 @@ def edit_event(request, uuid=None):
                         asg_obj.delete()
                         obj.available = True
                         obj.save()
+###############################
+                fmList_c = form.cleaned_data.get('instructor_contact').all()
+                objList_c = thisEvent.instructor_contact.all()
+
+                # print objList_c
+                # print fmList_c
+
+                for asg_post in fmList_c:
+                    if asg_post not in objList_c:
+                        thisEvent.instructor_contact.add(asg_post)
+
+                for obj in objList_c:
+                    if obj not in fmList_c:
+                        print(obj)
+                        thisEvent.instructor_contact.remove(obj)
+###############################
+                fmList_d = form.cleaned_data.get('caseAssigned').all()
+                objList_d = thisEvent.caseAssigned.all()
+
+                # print objList_d
+                # print fmList_d
+
+                for asg_post in fmList_d:
+                    if asg_post not in objList_d:
+                        thisEvent.caseAssigned.add(asg_post)
+
+                for obj in objList_d:
+                    if obj not in fmList_d:
+                        print(obj)
+                        thisEvent.caseAssigned.remove(obj)
+#############################
                 if request.POST.get("_stay"):
                     form = eventForm(instance=thisEvent)
                     form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
