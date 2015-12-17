@@ -1,10 +1,10 @@
 {% extends "pdf/pdf_base.html" %}
-
+{% load staticfiles %}
 {% block layout_style %}
     <style type="text/css" xmlns="http://www.w3.org/1999/html">
         @page {
             size: {{ pagesize|default:"Letter" }};
-            margin-left: 5.5cm;
+            margin-left: 2cm;
             margin-right: 2.5cm;
             margin-top: 2.5cm;
             margin-bottom: 2cm;
@@ -20,32 +20,78 @@
 {% endblock %}
 
 {% block extra_style %}
+ <style type="text/css">
+        @font-face { font-family: Lato; src: url(fonts/Lato-Bol.ttf); font-weight: bold; }
+        @font-face { font-family: Lato; src: url(fonts/Lato-Reg.ttf); }
+        @font-face { font-family: "Lato Light"; src: url(fonts/Lato-Lig.ttf); }
+        html {
+            font-family: "Lato", "Helvetica", "sans-serif";
+            color: #333333;
+        }
+        p {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            font-family: "Lato", "Helvetica", "sans-serif";
+        }
 
+     .header { color: #7f7f7f;  }
+     .header p { font-size: 13px; line-height: 1.5em; }
+     .logo { margin-left: 20px; width: 400px; padding-bottom: -50px;  }
+     .logo img { zoom: 80%; }
+     .main { margin-top: .5cm; padding-top: -10px;}
+     .event-info { border-bottom-style: solid; border-bottom-width: 1px; }
+     .requests { border-bottom-style: solid; border-bottom-width: 1px; }
+     .assignment { border-bottom-style: solid; border-bottom-width: 1px; }
+     .main h1 { font-size: 20px; }
+
+</style>
 {% endblock %}
 
 {%block page_header%}
+<div id="page-header">
+     <div class="header">
+      <p class="logo"><img src="{% static '/static/img/pdf/LogoShipping.png' %}"/></p>
+     </div>
+    </div>
 
+   <hr>
 {% endblock %}
 
 {% block content %}
-    <div id="content">
-    <p> {{ event.title }} </br>
-        {{ event.start }} </br>
-        {{ event.end }} </br>
-        {{ event.all_day }} </br>
-        {{ event.laptopsRequested }} </br>
-        {{ event.projectorRequested }} </br>
-        {{ event.dateShipped }} </br>
-        {{ event.hwAssigned }} </br>
-        {{ event.ctAssigned }} </br>
-        {{ event.abAssigned }} </br>
-        {{ event.caseAssigned }} </br>
-        {{ event.configAssigned }} </br>
-        {{ event.site }} </br>
-        {{ event.nextEvent }} </br>
-        {{ event.Transition_To_Event }} </br>
-        {{ event.Transition_from_event }} </br>
+    <div id="content" class="main">
+        <h1>Event Information</h1>
+      <div class= "event-info">
+       <p><b>Contact:</b>&nbsp;{{ event.ctAssigned }}</br>
+       <b>Event Name:</b>&nbsp; {{ event.title }} </br>
+       <b>Start Date:</b>&nbsp; {{ event.start }} </br>
+       <b>End Date: </b>&nbsp;   {{ event.end }} </br>
+       <b>All Day Event:</b>&nbsp; {{ event.all_day }}</br></p>
+      </div>  <!--End event info -->
 
-    </p>
+       <h1>Requested Assets</h1>
+      <div class="requests">
+          <p><b>Number of Laptops:</b>&nbsp; {{ event.laptopsRequested }}</br>
+          <b>Projector Requested:</b> &nbsp;{{ event.projectorRequested }}</br></p>
+      </div><!-- end requests -->
+
+        <h1>Assigned Assets</h1>
+        <div class="assignment">
+        <p>
+        <b>Hardware:</b>&nbsp;{{ event.hwAssigned }}</br>
+        <b>Configuration:</b>&nbsp;{{ event.configAssigned }}</br>
+        <b>Cases:</b>&nbsp;{{ event.caseAssigned }}</br>
+        <b>Airbill:</b>&nbsp;{{ event.abAssigned }}</br></p>
+
+        </div> <!-- end assignment -->
+
+        <h1>Shipping and Transitions</h1>
+        <div class="shipping">
+        <p><b>Ship Date:</b>&nbsp;{{ event.dateShipped }}</br>
+        <b>Location:</b>&nbsp;{{ event.site }}</br>
+        <b>Next Event:</b>&nbsp;{{ event.nextEvent }}</br>
+        <b>Transition To:</b>&nbsp;{{ event.Transition_To_Event }}</br>
+        <b>Transition From:</b>&nbsp;{{ event.Transition_from_event }}</br></p>
+        </div> <!-- end shipping -->
     </div>
+
 {% endblock %}

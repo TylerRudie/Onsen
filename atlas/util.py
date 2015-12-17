@@ -1,4 +1,5 @@
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+from django.utils import timezone
 from collections import Counter
 import atlas.models
 
@@ -33,6 +34,13 @@ def get_hw_staus_stats(hwType):
     return c.items()
 
 def get_hw_staus_stats2():
-
     c = Counter([item.status for item in atlas.models.hardware.objects.all()])
     return c.items()
+
+def get_def_startDate():
+    date = timezone.localtime(timezone.now())
+    return date.replace(hour=06, minute=0, second=0)
+
+def get_def_endDate():
+    date = timezone.localtime(timezone.now())
+    return date.replace(hour=22, minute=0, second=0)

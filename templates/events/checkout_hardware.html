@@ -128,6 +128,9 @@
                                     <th data-hide="phone,tablet">
                                         <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
                                             </i>Config</th>
+                                    <th data-hide="phone">
+                                        <i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
+                                            </i>Type</th>
                                     <th data-hide="phone,tablet">
                                         <i class="fa fa-fw txt-color-blue hidden-md hidden-sm hidden-xs">
                                             </i>Status</th>
@@ -149,6 +152,9 @@
                                 </td>
                                 <td>
                                     {{ item.hardwareID.config }}
+                                </td>
+                                <td>
+                                    {{ item.hardwareID.type }}
                                 </td>
                                 <td>
                                    {{ item.hardwareID.status }}

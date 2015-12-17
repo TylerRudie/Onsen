@@ -1,0 +1,205 @@
+{% extends "pdf/pdf_base.html" %}
+{% load staticfiles %}
+{% block layout_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+        @page {
+            size: {{ pagesize|default:"Letter" }};
+            margin-left: 5mm;
+            margin-right: 5mm;
+            margin-top: 5mm;
+            margin-bottom: 5mm;
+                @frame header {
+                    -pdf-frame-content: page-header;
+                    margin-top: 5mm;
+                    margin-right: 5mm;
+                    margin-bottom: 5mm;
+                    margin-left: 1.2cm;
+                    }
+            }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+ <style type="text/css">
+        @font-face { font-family: Lato; src: url(fonts/Lato-Bol.ttf); font-weight: bold; }
+        @font-face { font-family: Lato; src: url(fonts/Lato-Reg.ttf); }
+        @font-face { font-family: "Lato Light"; src: url(fonts/Lato-Lig.ttf); }
+        html {
+            font-family: "Lato", "Helvetica", "sans-serif";
+            color: #333333;
+        }
+        p {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            font-family: "Lato", "Helvetica", "sans-serif";
+        }
+
+{#     .header { color: #7f7f7f;  }#}
+{#     .header p { font-size: 13px; line-height: 1.5em; }#}
+{#     .logo { margin-left: 20px; width: 400px; padding-bottom: -20px;  }#}
+{#     .logo img { zoom: 80%; }#}
+{#     .main { margin-top: .5cm; padding-top: -10px;}#}
+{#     .event-info { border-bottom-style: solid; border-bottom-width: 1px;}#}
+{#     .requests { border-bottom-style: solid; border-bottom-width: 1px;  }#}
+{#     .shipping { border-bottom-style: solid; border-bottom-width: 1px; }#}
+     .main h1 { font-size: 20px; }
+     .table, th, td {   border: 1px solid black;
+                        border-collapse: collapse;
+                        text-align: center;
+                        padding: 2px}
+{#     th, td { border: 1px solid black; border-collapse: collapse; white-space: pre-wrap; }#}
+{#     colgroup { margin-top: 0px; }#}
+{#     .asset-table { font-size: 12px; }#}
+{#     .asset-table th { padding-top: 5px; text-align: center; }#}
+{#     .asset-table td { padding-left: 20px; padding-top: 5px;  }#}
+{#     .case-table { font-size: 12px; }#}
+{#     .case-table th { padding-top: 5px; text-align: center; }#}
+{#     .case-table td { padding-left: 20px; padding-top: 5px; }#}
+</style>
+{% endblock %}
+
+{%block page_header%}
+<div id="page-header">
+    <h1 style="text-align: center">Mobile Event(s) Information Sheet</h1>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="main">
+        <div >
+            <h1 style="text-align: center"> {{ event.title }} </h1>
+            <br>
+            <p>
+            Contact:   {{ event.shipping_contact.firstName }} {{ event.shipping_contact.lastName }}
+                        ( {{ event.shipping_contact.company }} ) {{ event.shipping_contact.phone }}<br>
+            Instructor: {% for inst in event.instructor_contact.all %}
+                            {{ inst.firstName }} {{ inst.lastName }},
+                        {% endfor %}
+            </p>
+            <table>
+                <tr>
+                    <th> Event Dates </th>
+                    <th> Event </th>
+                    <th> Site of Event </th>
+                    <th> Laptops Requested </th>
+                    <th> Projector </th>
+                    <th> Number of Item(s) </th>
+                    <th> Date Shipped </th>
+                </tr>
+                <tr>
+                    <td>
+                        {{ event.start | date:"m/d" }} - {{ event.end | date:"m/d/Y"  }}
+                    </td>
+                    <td>
+                        {% for cfg in event.configAssigned.all %}
+                            {% if cfg.not_load == False %}
+                                {{ cfg.cfg_name }}<br>
+
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{ event.site }}
+                    </td>
+                    <td>
+                        {{ event.laptopsRequested }}
+                    </td>
+                    <td>
+                        {% if event.projectorRequested == True %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+
+                    </td>
+                    <td>
+                        {{ event.caseAssigned.count }}
+                    </td>
+                    <td>
+                        {{ event.dateShipped }}
+                    </td>
+                </tr>
+            </table>
+        <br>
+            <table>
+                <tr>
+                    <th width="10%">Number of Devices</th>
+                    <th width="10%">Type</th>
+                    <th width="30%">Case</th>
+                    <th width="50%">S/N</th>
+                </tr>
+                <tr>
+                    <td>
+                        {{ event.hwAssigned.count }}
+                    </td>
+                    <td>
+
+                    </td>
+                    <td>
+                        {{ event.caseAssigned.all| join:' , ' }}
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+
+                {% for item in event.hwAssigned.all|dictsort:"type"  %}
+                    <tr>
+                        <td></td>
+                        <td>{{ item.type}}</td>
+                        <td></td>
+
+                        <td>{{ item.serialNum }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        <br>
+            <p>Next Event/Venue Information</p>
+            <table>
+                <tr>
+                    <th >Dates Of Event</th>
+                    <th >Site of Even</th>
+                    <th >Total Number of Item(s)</th>
+                    <th >Return FedEx Airbills</th>
+                    <th >Date To Be Shipped</th>
+                </tr>
+                <tr>
+                    <td>
+                        {% if event.nextEvent == None %}
+                            {{ event.Transition_from_event | date:"m/d/Y" }}
+                        {% else %}
+                            {{ event.nextEvent.start | date:"m/d/Y" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.nextEvent == None %}
+                            Transit to {{ event.pool.poolName }}
+                        {% else %}
+                           {{ event.nextEvent.title }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if event.nextEvent == None %}
+                            {{ event.caseAssigned.count }}
+                        {% else %}
+                           {{ event.nextEvent.caseAssigned.count }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ event.Shipping_From }}
+                    </td>
+                    <td>
+                        {% if event.nextEvent == None %}
+                            {{ event.Transition_from_event | date:"m/d/Y" }}
+                        {% else %}
+                            {{ event.end | date:"m/d/Y" }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        <br>
+        <p style="font-size:medium;">Note: Every effort should be made to ship the equipment out on the last day of the Event. If that is not feasible, equipment
+ has to be shipped out the following day.  If you have questions, please contact me at 314-264-8530. – Linda Zink</p>
+
+        </div>
+    </div>
+{% endblock %}

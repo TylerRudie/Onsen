@@ -22,7 +22,7 @@ from django.http import JsonResponse
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
-## TODO Setup reverse on all submit views
+
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
@@ -126,7 +126,7 @@ def new_event(request):
                                                         'seat_revenue': df.default_seat_revenue,
                                                         'projector_revenue': df.default_projector_revenue})
     form.fields['nextEvent'].queryset = event.objects.none()
-    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True)
+    form.fields['hwAssigned'].queryset = hardware.objects.filter(available=True, poolID__retired=False)
     if request.POST:
         form = eventForm(request.POST)
         if request.POST.get("_cancel"):
@@ -183,7 +183,7 @@ def edit_event(request, uuid=None):
             if form.is_valid():
                 fm = form.save(commit=False)
                 fm.save()
-
+################################
                 fmList = form.cleaned_data.get('hwAssigned').all()
                 objList = thisEvent.hwAssigned.all()
 
@@ -198,10 +198,62 @@ def edit_event(request, uuid=None):
                         asg_obj.delete()
                         obj.available = True
                         obj.save()
+###############################
+                fmList_c = form.cleaned_data.get('instructor_contact').all()
+                objList_c = thisEvent.instructor_contact.all()
+
+                # print objList_c
+                # print fmList_c
+
+                for asg_post in fmList_c:
+                    if asg_post not in objList_c:
+                        thisEvent.instructor_contact.add(asg_post)
+
+                for obj in objList_c:
+                    if obj not in fmList_c:
+                        print(obj)
+                        thisEvent.instructor_contact.remove(obj)
+###############################
+                fmList_d = form.cleaned_data.get('caseAssigned').all()
+                objList_d = thisEvent.caseAssigned.all()
+
+                # print objList_d
+                # print fmList_d
+
+                for asg_post in fmList_d:
+                    if asg_post not in objList_d:
+                        thisEvent.caseAssigned.add(asg_post)
+
+                for obj in objList_d:
+                    if obj not in fmList_d:
+                        print(obj)
+                        thisEvent.caseAssigned.remove(obj)
+#############################
+                fmList_F = form.cleaned_data.get('configAssigned').all()
+                objList_F = thisEvent.configAssigned.all()
+
+                # print objList_d
+                # print fmList_d
+
+                for asg_post in fmList_F:
+                    if asg_post not in objList_F:
+                        thisEvent.configAssigned.add(asg_post)
+
+                for obj in objList_F:
+                    if obj not in fmList_F:
+                        print(obj)
+                        thisEvent.configAssigned.remove(obj)
+#############################
+
+
+
+
+
+
                 if request.POST.get("_stay"):
                     form = eventForm(instance=thisEvent)
                     form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                    form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
                     print(thisEvent.hwAssigned.all())
                     context = {
                         "title": title,
@@ -224,7 +276,7 @@ def edit_event(request, uuid=None):
             else:
                 form = eventForm(instance=thisEvent)
                 form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+                form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
                 print(thisEvent.hwAssigned.all())
                 context = {
                     "title": title,
@@ -238,7 +290,7 @@ def edit_event(request, uuid=None):
 
         form = eventForm(instance=thisEvent)
         form.fields['nextEvent'].queryset = event.objects.filter(start__gte= thisEvent.end)
-        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True) | Q(events__evID=thisEvent.evID))
+        form.fields['hwAssigned'].queryset = hardware.objects.filter(Q(available=True, poolID__retired=False) | Q(events__evID=thisEvent.evID))
         print(thisEvent.hwAssigned.all())
         context = {
             "title": title,
@@ -276,6 +328,7 @@ class srf_pdfView(PDFTemplateView):
         ev = get_object_or_404(event, evID=uuid)
         print ev
         context["event"] = ev
+        context["today"] = timezone.now()
         return context
 
     @method_decorator(login_required)

@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum, Q
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import timedelta
+from datetime import timedelta, time
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from exclusivebooleanfield.fields import ExclusiveBooleanField
@@ -44,6 +44,7 @@ class contact(models.Model):
 
     def __unicode__(self):
         return self.firstName + ' ' + self.lastName + ' <' + self.email + '>'
+
 ###############################################
 
 class pool(models.Model):
@@ -78,6 +79,7 @@ class pool(models.Model):
 
     def __unicode__(self):
         return  self.poolName
+
 ###############################################
 
 class hardware(models.Model):
@@ -212,6 +214,7 @@ class hardware(models.Model):
             return ""
         else:
             return le
+
 ###############################################
 
 class case(models.Model):
@@ -224,8 +227,9 @@ class case(models.Model):
                                 max_length=200)
     def __unicode__(self):
         return self.caseName
-###############################################
+        ordering = ['caseName']
 
+###############################################
 
 class airbill(models.Model):
 
@@ -243,6 +247,7 @@ class airbill(models.Model):
 
     def __unicode__(self):
         return self.tracking
+
 ###############################################
 
 class configuration (models.Model):
@@ -263,9 +268,9 @@ class configuration (models.Model):
                                    default=False)
 
     def __unicode__(self):
-        return self.cfg_name + '<' + self.days_Conf.__str__() +'>'
-###############################################
+        return self.cfg_name + ' < ' + self.days_Conf.__str__() +' >'
 
+###############################################
 
 class event(models.Model):
 
@@ -276,18 +281,22 @@ class event(models.Model):
     title   = models.CharField('Title',
                              max_length=200)
 
-    start   = models.DateTimeField('Start')
+    start   = models.DateTimeField('Start',
+                                   default= atlas.util.get_def_startDate)
 
-    end     = models.DateTimeField('End')
+    end     = models.DateTimeField('End',
+                                   default= atlas.util.get_def_endDate)
 
     all_day = models.BooleanField('All day',
-                                  default=False)
+                                  default=True)
 
-    laptopsRequested = models.IntegerField(blank=True,
+    laptopsRequested = models.IntegerField( 'Laptops Requested',
+                                            blank=True,
                                             validators=[MinValueValidator(0)],
                                             null=True)
 
-    projectorRequested = models.BooleanField(default=False)
+    projectorRequested = models.BooleanField('Projector Requested',
+                                            default=False)
 
     dateShipped = models.DateField('Date Shipped',
                                    blank=True,
@@ -319,10 +328,12 @@ class event(models.Model):
                                         verbose_name='Assigned Airbills')
 
     caseAssigned = models.ManyToManyField(case,
-                                          blank=True)
+                                          blank=True,
+                                          verbose_name='Shipping Cases')
 
     configAssigned = models.ManyToManyField(configuration,
-                                            blank=True)
+                                            blank=True,
+                                            verbose_name='Configuration',)
 
     site = models.CharField(max_length=200,
                             blank=True)
@@ -429,8 +440,6 @@ class event(models.Model):
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
 
-
-
 ###############################################
 
 class event_airbill(models.Model):
@@ -445,6 +454,7 @@ class event_airbill(models.Model):
     class meta:
         verbose_name = 'Assigned Airbill'
 
+###############################################
 
 class assignment(models.Model):
 
@@ -474,6 +484,7 @@ class assignment(models.Model):
 
     class Meta:
         unique_together = ('eventID', 'hardwareID',)
+
 
     def __unicode__(self):
         return self.eventID.title + '<>' + self.hardwareID.serialNum

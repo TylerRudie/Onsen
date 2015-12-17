@@ -5,7 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from crispy_forms.bootstrap import TabHolder, Tab, AppendedText, PrependedText, FormActions
 from better_filter_widget import BetterFilterWidget
-## TODO finish filling out form data
+
 
 class eventForm(forms.ModelForm):
     helper = FormHelper()
@@ -31,8 +31,8 @@ class eventForm(forms.ModelForm):
             ),
             Tab(
                 'Details',
-                'site',
                 'seat_revenue',
+                'site',
                 'projector_revenue',
                 'laptopsRequested',
                 'projectorRequested',
@@ -88,12 +88,12 @@ class eventForm(forms.ModelForm):
         }
         readonly_fields = ['Transition_To_Event']
 
-##TODO add save, and save and return buttons
+
 class hardwareForm(forms.ModelForm):
 
     class Meta:
         model = hardware
-        exclude = ['hwID','available' ]
+        exclude = ['hwID','available', 'seat' ]
 
 
 class multiHardwareForm(forms.ModelForm):
@@ -124,7 +124,7 @@ class multiHardwareForm(forms.ModelForm):
 
     class Meta:
         model = hardware
-        exclude = ['hwID','available','serialNum']
+        exclude = ['hwID','available','serialNum','seat']
 
 
 
