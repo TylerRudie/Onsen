@@ -14,11 +14,16 @@ from easy_pdf.views import PDFTemplateView
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from .util import get_default_pool, get_hw_staus_stats
-
+from django.db.models import Sum, Count
 from django.forms.models import model_to_dict
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
-
+from django.contrib.humanize.templatetags.humanize import intcomma
+from datetime import timedelta
+import json, datetime, itertools
+from django.forms.models import model_to_dict
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
@@ -62,38 +67,146 @@ def home_redirect(request):
     return redirect('/')
 
 @login_required
+@login_required
+def get_geo(request):
+    weekevents = event.objects.all().filter(Q(start__lte=datetime.date.today(), end__gte=datetime.date.today()) | Q(start__lte=datetime.date.today()+timedelta(days=7),start__gte=datetime.date.today()))
+    contactids = weekevents.values('shipping_contact_id')
+#   addresses = [{x.address1, x.city, x.state, x.zip} for x in contact.objects.all().filter(ctID__in=contactids)]
+#    addresses = [{x.address1.encode('utf8'), x.city.encode('utf8'), x.state.encode('utf8'), x.zip.encode('utf8')} for x in contact.objects.all().filter(ctID__in=contactids)]
+#    addresses = contact.objects.all().filter(ctID__in=contactids).values_list('address1','city','state','zip')
+    addresses = contact.objects.all().filter(ctID__in=contactids).values_list('address1','city','state','zip')
+    utfformatted = [[x.encode("utf8") for x in sets] for sets in addresses]
+    formatted = str(utfformatted).replace("'","").replace("[[","'").replace("[","'").replace(", '","'").replace("]]","'").replace("]","'")
+#    formatted = str(utfformatted).replace("'","").replace("[[","'").replace("[","'").replace("]]","'").replace("]","'")
+#    formatted = str(addresses).replace("'","").replace("[set","").replace("([","'").replace("])","'").replace(", ",",'").replace("]]","'")
+#    formatted = str(addresses).replace("'","").replace("[set","").replace("([","'").replace("])","'").replace(", set'",",'").replace("]","'").replace("''","'")
+    return JsonResponse(formatted, safe=False )
+
+@login_required
 def home(request):
+
+#Map
+    weekevents = event.objects.all().filter(Q(start__lte=datetime.date.today(), end__gte=datetime.date.today()) | Q(start__lte=datetime.date.today()+timedelta(days=7),start__gte=datetime.date.today()))
+    contactids = weekevents.values('shipping_contact_id')
+#   addresses = [{x.address1, x.city, x.state, x.zip} for x in contact.objects.all().filter(ctID__in=contactids)]
+    addresses = [{x.address1.encode('utf8'), x.city.encode('utf8'), x.state.encode('utf8'), x.zip.encode('utf8')} for x in contact.objects.all().filter(ctID__in=contactids)]
+#    addresses = contact.objects.all().filter(ctID__in=contactids).values_list('address1','city','state','zip')
+#    addresses = contact.objects.all().filter(ctID__in=contactids).values_list('address1','city','state','zip')
+#    utfformatted = [[x.encode("utf8") for x in sets] for sets in addresses]
+#    formatted = str(utfformatted).replace("'","").replace("[[","'").replace("[","'").replace(", '",",'").replace("]]","'").replace("]","'")
+    formatted = str(addresses).replace("'","").replace("[set","").replace('([','"').replace('])','"').replace(", set",',"').replace("]",'"').replace('""','"')
+
+#    formatted = addresses
+#    Total Completed Assignment
+    tca = assignment.objects.filter(Q(
+                                                outUser__isnull=False,
+                                                inUser__isnull=True,
+                                                eventID__end__lte= timezone.now())| Q(
+                                                outUser__isnull=False,
+                                                inUser__isnull=False,
+                                                )
+                                        )
+#    Total Revenue
+    trdata = tca.aggregate(Sum('eventID__seat_revenue')).values()[0]
+
+    dollars = round(float(trdata), 2)
+
+    tr = "$%s%s" % (intcomma(int(dollars)), ("%0.2f" % dollars)[-3:])
+
+#     Total Events
+    te = tca.values('eventID_id').distinct().count()
+
+#    Total Hardware Shipped
+    thsdata = tca.exclude(hardwareID__isnull=True).count()
+
+    ths = thsdata
+
+#    Total Hardware
+    retiredpools=pool.objects.all().filter(retired=1)  # Retired Pools
+    allhw=hardware.objects.all()  # All Hardware
+    allhwa=allhw.exclude(poolID_id=retiredpools)  # All Hardware Available (Not Retired)
+
+    hwneedssetup=assignment.objects.filter(hardwareID=allhw,outUser__isnull=True,inUser__isnull=True).count()
+
+    th = allhw.exclude(poolID_id=retiredpools).count()  # Count of All Hardware (Not Retired)
+
+    tha = allhw.filter(available=1).exclude(poolID_id=retiredpools)  # All Hardware Available (Not Retired)
+    ta= tha.count()  # Count of All Hardware Available (Not Retired)
+
+    thun = allhw.filter(available=0).exclude(poolID_id=retiredpools)  # All Hardware Unavailable (Not Retired)
+    tau= thun.count() # Count of All Hardware Unavailable (Not Retired)
+
+    tap= round((float(ta)/float(th)*100), 2)
+    taup= round((float(tau)/float(th)*100), 2)
+
+    tla= tha.filter(type='Laptop').count()
+    tlaptops =allhwa.filter(type='Laptop').count()
+
+    tpa= tha.filter(type='Project').count()
+    tprojects= allhwa.filter(type='Projector').count()
+
+    tsma= tha.filter(type='SpaceMouse').count()
+    tspacemouse= allhwa.filter(type='SpaceMouse').count()
+
+    if tprojects > 0:
+        tprojects_num =  (tla/tlaptops)*100
+    else:
+        tprojects_num = 0
 
     context = {
             "title": 'Home',
             "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
-            "projector_usage": get_hw_staus_stats(hwType='Test')
+            "projector_usage": get_hw_staus_stats(hwType='Test'),
+            "total_hardware": th,
+            "total_havail": ta,
+            "total_availpercent": tap,
+            "hw_need_setup": hwneedssetup,
+            "total_revenue": tr,
+            "total_events": te,
+            "total_hardware_shipped": ths,
+            "total_hutilized": taup,
+            "total_laptops_avail": tla,
+            "total_laptops": tlaptops,
+            "total_lp": (tla/tlaptops)*100,
+            "total_projectors_avail": tpa,
+            "total_projectors": tprojects,
+            "total_pp":  tprojects_num,
+            "total_sm_avail": tsma,
+            "total_sm": tspacemouse,
+            "total_smp": (tsma/tspacemouse)*100,
+            "geo_code": formatted
         }
+
     return render(request, "home.html", context)
 
+
 def draw_graph(request, x="None"):
-    total = hardware.objects.filter(type=x).count()
-    inuse = hardware.objects.filter(type=x).filter(available=1).count()
-    percent = (inuse/total)*100
+    retiredpools=pool.objects.all().filter(retired=1)
+    hwtype = hardware.objects.filter(type=x).exclude(poolID_id=retiredpools)
+    total = hwtype.count()
+    free = hwtype.filter(available=1).count()
+    percent = (free/total)*100
 
     graph_data = []
 
     avail_data = {}
     avail_data["value"] = percent
-    avail_data["label"] =  x+"(s)"" Available"
+    avail_data["label"] =  x+" Available"
     graph_data.append(avail_data)
 
     unavail_data = {}
-    unavail_data["value"] = percent-100
-    unavail_data["label"] =  x+"(s)"+" Unavailable"
+    unavail_data["value"] = 100-percent
+    unavail_data["label"] =  x+" Unavailable"
     graph_data.append(unavail_data)
 
     return JsonResponse(graph_data,safe=False)
+
 
 ###############################################
 
 @login_required
 def dashboard(request):
+
     return render(request, "dashboard.html", {})
 
 @login_required

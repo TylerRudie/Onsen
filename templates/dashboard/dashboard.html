@@ -29,8 +29,6 @@
 
 </div>
 <!-- END RIBBON -->
-
-
 <!-- MAIN CONTENT -->
 <div id="content">
 
@@ -39,23 +37,21 @@
             <h1 class="page-title txt-color-blueDark"><i class="fa-fw fa fa-home"></i> Dashboard <span>> My Dashboard</span></h1>
         </div>
         <div class="col-xs-12 col-sm-5 col-md-5 col-lg-8">
+            {% load humanize %}
             <ul id="sparks" class="">
                 <li class="sparks-info">
-                    <h5> My Income <span class="txt-color-blue">$47,171</span></h5>
+                    <h5> Total Revenue <span class="txt-color-blue">{{total_revenue}}</span></h5>
                     <div class="sparkline txt-color-blue hidden-mobile hidden-md hidden-sm">
-                        1300, 1877, 2500, 2577, 2000, 2100, 3000, 2700, 3631, 2471, 2700, 3631, 2471
                     </div>
                 </li>
                 <li class="sparks-info">
-                    <h5> Site Traffic <span class="txt-color-purple"><i class="fa fa-arrow-circle-up"></i>&nbsp;45%</span></h5>
+                    <h5> Total Events Held <span class="txt-color-purple"><i></i>&nbsp;{{total_events|intcomma}}</span></h5>
                     <div class="sparkline txt-color-purple hidden-mobile hidden-md hidden-sm">
-                        110,150,300,130,400,240,220,310,220,300, 270, 210
                     </div>
                 </li>
                 <li class="sparks-info">
-                    <h5> Site Orders <span class="txt-color-greenDark"><i class="fa fa-shopping-cart"></i>&nbsp;2447</span></h5>
+                    <h5> Total Hardware Shipped <span class="txt-color-greenDark"><i></i>&nbsp;{{total_hardware_shipped|intcomma}}</span></h5>
                     <div class="sparkline txt-color-greenDark hidden-mobile hidden-md hidden-sm">
-                        110,150,300,130,400,240,220,310,220,300, 270, 210
                     </div>
                 </li>
             </ul>
@@ -97,8 +93,6 @@
                     <div class="no-padding">
                         <!-- widget edit box -->
                         <div class="jarviswidget-editbox">
-
-                            test
                         </div>
                         <!-- end widget edit box -->
 
@@ -110,32 +104,31 @@
                                         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                                             <div id="updating-chart" class="chart-large txt-color-blue">
                                         <div id="donuts">
-                                            <div id="donut-graph1" class="chart"></div><div id="donut-graph2" class="chart"></div><div id="donut-graph3" class="chart"></div></div>
+                                          <div id="donut-graph1" class="chart"></div><div id="donut-graph2" class="chart"></div><div id="donut-graph3" class="chart"></div></div>
                                          </div>
-
                                         </div>
                                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 show-stats">
 
                                             <div class="row">
-                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> My Tasks <span class="pull-right">130/200</span> </span>
+                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> Total Hardware Utilized <span class="pull-right">{{total_hutilized}}%</span> </span>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-color-blueDark" style="width: 65%;"></div>
+                                                        <div class="progress-bar bg-color-blue" style="width: {{total_hutilized}}%;"></div>
                                                     </div> </div>
-                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> Transfered <span class="pull-right">440 GB</span> </span>
+                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> Total Hardware Available <span class="pull-right">{{total_havail}}/{{total_hardware}}</span> </span>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-color-blue" style="width: 34%;"></div>
+                                                        <div class="progress-bar bg-color-blueDark" style="width: {{total_availpercent}}%;"></div>
                                                     </div> </div>
-                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> Bugs Squashed<span class="pull-right">77%</span> </span>
+                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text">Total Laptops Available<span class="pull-right">{{total_laptops_avail}}/{{total_laptops}}</span> </span>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-color-blue" style="width: 77%;"></div>
+                                                        <div class="progress-bar bg-color-blue" style="width: {{total_lp}}%;"></div>
                                                     </div> </div>
-                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> User Testing <span class="pull-right">7 Days</span> </span>
+                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text">Total Projectors Available<span class="pull-right">{{total_projectors_avail}}/{{total_projectors}}</span> </span>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-color-greenLight" style="width: 84%;"></div>
+                                                        <div class="progress-bar bg-color-greenLight" style="width: {{total_pp}}%;"></div>
                                                     </div> </div>
-                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text"> User Testing <span class="pull-right">7 Days</span> </span>
+                                                <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12"> <span class="text">Total SpaceMouse Available<span class="pull-right">{{total_sm_avail}}/{{total_sm}}</span> </span>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-color-greenLight" style="width: 84%;"></div>
+                                                        <div class="progress-bar bg-color-greenLight" style="width: {{total_smp}}%;"></div>
                                                     </div> </div>
 
 
@@ -370,9 +363,7 @@
                         <div class="widget-body widget-hide-overflow no-padding">
                             <!-- content goes here -->
 
-                            <!-- CHAT CONTAINER -->
-
-
+                            <!-- CHAT CONTAINER --
                             <!-- end content -->
                         </div>
 
@@ -478,10 +469,7 @@
                         <span class="widget-icon"> <i class="fa fa-map-marker"></i> </span>
                         <h2>Birds Eye</h2>
                         <div class="widget-toolbar hidden-mobile">
-                            <span class="onoffswitch-title"><i class="fa fa-location-arrow"></i> Realtime</span>
-										<span class="onoffswitch">
-											<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" checked="checked" id="myonoffswitch">
-											<label class="onoffswitch-label" for="myonoffswitch"> <span class="onoffswitch-inner" data-swchon-text="YES" data-swchoff-text="NO"></span> <span class="onoffswitch-switch"></span> </label> </span>
+                        <span class="widget-icon"> <i class="fa fa-table"></i> </span>
                         </div>
                     </header>
 
@@ -499,13 +487,7 @@
                         <div class="widget-body no-padding">
                             <!-- content goes here -->
 
-                            <div id="vector-map" class="vector-map"></div>
-                            <div id="heat-fill">
-                                <span class="fill-a">0</span>
-
-                                <span class="fill-b">5,000</span>
-                            </div>
-
+                            <div id="map_canvas" class="google_maps"></div>
                             <!-- end content -->
 
                         </div>
@@ -554,8 +536,6 @@
                         <!-- widget content -->
                         <div class="widget-body no-padding">
 
-                           <div id="donuts"> <div id="donut-graph" class="no-padding"></div><div id="donut-graph2" class="chart no-padding"></div><div id="donut-graph3" class="chart no-padding"></div></div>
-
                         </div>
                         <!-- end widget content -->
 
@@ -588,10 +568,6 @@
 <script src="{% static 'js/plugin/flot/jquery.flot.time.min.js'%}"></script>
 <script src="{% static 'js/plugin/flot/jquery.flot.tooltip.min.js'%}"></script>
 
-<!-- Vector Maps Plugin: Vectormap engine, Vectormap language -->
-<script src="{% static 'js/plugin/vectormap/jquery-jvectormap-1.2.2.min.js'%}"></script>
-<script src="{% static 'js/plugin/vectormap/jquery-jvectormap-world-mill-en.js'%}"></script>
-
 <!-- Full Calendar -->
 <script src="{% static 'js/plugin/moment/moment.min.js'%}"></script>
 <script src="{% static 'js/plugin/fullcalendar/jquery.fullcalendar.min.js'%}"></script>
@@ -599,12 +575,46 @@
 <!-- Morris Chart Dependencies -->
 <script src="{% static 'js/plugin/morris/raphael.min.js'%}"></script>
 <script src="{% static 'js/plugin/morris/morris.min.js'%}"></script>
+<script src="/map/get_map/"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=false&.js"></script>
 
-<script>
+
+<script type="text/javascript">
+
     $(document).ready(function() {
+
+$.getJSON("/map/get_geo", function(geo){
+    var geoX = String(geo);
+    var geoclean = geoX.replace("''","','").replace(/\\"/g, '"');
+    var geomatch = String(geoclean).match(/'.*?'/g);
+    var geoclean2 = String(geoclean)
+    var addresses = geoclean2.split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
+
+
+    var map;
+    var elevator;
+    var myOptions = {
+        zoom: 5,
+        center: new google.maps.LatLng(40, -80),
+        mapTypeId: 'terrain'
+    };
+    map = new google.maps.Map($('#map_canvas')[0], myOptions);
+
+    for (var x = 0; x < addresses.length; x++) {
+        $.getJSON('http://maps.googleapis.com/maps/api/geocode/json?address='+addresses[x]+'&sensor=false', null, function (data) {
+            var p = data.results[0].geometry.location
+            var latlng = new google.maps.LatLng(p.lat, p.lng);
+            new google.maps.Marker({
+                position: latlng,
+                map: map
+            });
+        });
+    }
+    })
 
         // DO NOT REMOVE : GLOBAL FUNCTIONS!
         pageSetUp();
+
 
         /*
          * PAGE RELATED SCRIPTS
@@ -621,6 +631,8 @@
         /*
          * TODO: add a way to add more todo's to list
          */
+
+
 
         // initialize sortable
         $(function() {
@@ -663,6 +675,7 @@
 
         }
 
+
         /*
          * RUN PAGE GRAPHS
          */
@@ -670,7 +683,7 @@
         /* TAB 1: UPDATING CHART */
         // For the demo we use generated data, but normally it would be coming from the server
 
-        if ($('#donut-graph').length>0) {
+        if ($('#donut-graph')) {
             $.getJSON("graph/draw_graph/Laptop/", function (json1){
                 Morris.Donut({
                     element : 'donut-graph1',
@@ -860,6 +873,9 @@
 
         });
 
+
+
+
         /*
          * VECTOR MAP
          */
@@ -875,33 +891,6 @@
             "BD" : 100
         };
 
-        $('#vector-map').vectorMap({
-            map : 'world_mill_en',
-            backgroundColor : '#fff',
-            regionStyle : {
-                initial : {
-                    fill : '#c4c4c4'
-                },
-                hover : {
-                    "fill-opacity" : 1
-                }
-            },
-            series : {
-                regions : [{
-                    values : data_array,
-                    scale : ['#85a8b6', '#4d7686'],
-                    normalizeFunction : 'polynomial'
-                }]
-            },
-            onRegionLabelShow : function(e, el, code) {
-                if ( typeof data_array[code] == 'undefined') {
-                    e.preventDefault();
-                } else {
-                    var countrylbl = data_array[code];
-                    el.html(el.html() + ': ' + countrylbl + ' visits');
-                }
-            }
-        });
 
         /*
          * FULL CALENDAR JS
@@ -992,81 +981,12 @@
             $('#calendar').fullCalendar('changeView', 'agendaDay');
         });
 
-        /*
-         * CHAT
-         */
-
-        $.filter_input = $('#filter-chat-list');
-        $.chat_users_container = $('#chat-container > .chat-list-body')
-        $.chat_users = $('#chat-users')
-        $.chat_list_btn = $('#chat-container > .chat-list-open-close');
-        $.chat_body = $('#chat-body');
-
-        /*
-         * LIST FILTER (CHAT)
-         */
-
-        // custom css expression for a case-insensitive contains()
-        jQuery.expr[':'].Contains = function(a, i, m) {
-            return (a.textContent || a.innerText || "").toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
-        };
-
-        function listFilter(list) {// header is any element, list is an unordered list
-            // create and add the filter form to the header
-
-            $.filter_input.change(function() {
-                var filter = $(this).val();
-                if (filter) {
-                    // this finds all links in a list that contain the input,
-                    // and hide the ones not containing the input while showing the ones that do
-                    $.chat_users.find("a:not(:Contains(" + filter + "))").parent().slideUp();
-                    $.chat_users.find("a:Contains(" + filter + ")").parent().slideDown();
-                } else {
-                    $.chat_users.find("li").slideDown();
-                }
-                return false;
-            }).keyup(function() {
-                // fire the above change event after every letter
-                $(this).change();
-
-            });
-
-        }
-
-        // on dom ready
-        listFilter($.chat_users);
-
-        // open chat list
-        $.chat_list_btn.click(function() {
-            $(this).parent('#chat-container').toggleClass('open');
-        })
-
-        $.chat_body.animate({
-            scrollTop : $.chat_body[0].scrollHeight
-        }, 500);
-
     });
 
-    // PAGE RELATED SCRIPTS
 
-    /*
-     * Run all morris chart on this page
-     */
-    $(document).ready(function() {
-
-
-        // DO NOT REMOVE : GLOBAL FUNCTIONS!
-        pageSetUp();
-
-
-        // donut
-
-    });
-
-    //setup_flots();
-    /* end flot charts */
 
 </script>
+
 <!-- END OF DASHBOARD -->
 {% endblock %}
 

@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'easy_pdf',
     'better_filter_widget',
     'exclusivebooleanfield',
+    'django.contrib.humanize',
     ## Project
     'fullcalendar',
     'atlas',
