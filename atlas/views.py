@@ -1,3 +1,4 @@
+from __future__ import division
 import json
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
@@ -26,6 +27,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, multiHardwareForm, configForm
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
+
 
 
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
