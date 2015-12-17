@@ -43,4 +43,4 @@ def get_def_startDate():
 
 def get_def_endDate():
     date = datetime.now()
-    return date.replace(hour=20, minute=0, second=0)
+    return date.replace(hour=22, minute=0, second=0)

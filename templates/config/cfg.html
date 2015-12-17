@@ -125,7 +125,7 @@
                                         <i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
                                         </i>Additional Days</th>
                                     <th><i class="fa fa-fw text-muted hidden-md hidden-sm hidden-xs">
-                                        </i>Pool</th>
+                                        </i>Scheduling</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -134,7 +134,7 @@
                                     <td> <a href="{% url 'config_edit' uuid=item.cfgID %}">{{ item.cfg_name }}</a>
                                     </td>
                                     <td>{{ item.days_Conf }}</td>
-                                    <td>{{ item.Scheduling }}</td>
+                                    <td>{{ item.not_load }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>
