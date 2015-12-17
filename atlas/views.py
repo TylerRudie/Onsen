@@ -29,6 +29,7 @@ from .forms import eventForm, hardwareForm, contactForm, airbillForm, poolForm, 
 from .models import event, hardware, contact, airbill, pool, assignment, configuration
 
 
+
 ## TODO - Update window.open to use URL reverse introspection (Do not hard code), and remove new window
 OPTIONS = """{  timeFormat: "H:mm",
                     customButtons: {
