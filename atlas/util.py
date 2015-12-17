@@ -1,4 +1,5 @@
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+
 from collections import Counter
 import atlas.models
 
@@ -33,6 +34,13 @@ def get_hw_staus_stats(hwType):
     return c.items()
 
 def get_hw_staus_stats2():
-
     c = Counter([item.status for item in atlas.models.hardware.objects.all()])
     return c.items()
+
+def get_def_startDate():
+    date = datetime.now()
+    return date.replace(hour=6, minute=0, second=0)
+
+def get_def_endDate():
+    date = datetime.now()
+    return date.replace(hour=20, minute=0, second=0)

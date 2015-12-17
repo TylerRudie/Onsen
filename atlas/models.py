@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Sum, Q
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import timedelta
+from datetime import timedelta, time
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from exclusivebooleanfield.fields import ExclusiveBooleanField
@@ -276,9 +276,11 @@ class event(models.Model):
     title   = models.CharField('Title',
                              max_length=200)
 
-    start   = models.DateTimeField('Start')
+    start   = models.DateTimeField('Start',
+                                   default= atlas.util.get_def_startDate)
 
-    end     = models.DateTimeField('End')
+    end     = models.DateTimeField('End',
+                                   default= atlas.util.get_def_endDate)
 
     all_day = models.BooleanField('All day',
                                   default=True)
