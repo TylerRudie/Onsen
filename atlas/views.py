@@ -302,7 +302,7 @@ def edit_event(request, uuid=None):
 
 
 class packing_pdfView(PDFTemplateView):
-    template_name = "pdf/pdf_packing_rudie.html"
+    template_name = "pdf/pdf_packing.html"
 
     def get_context_data(self, **kwargs):
         context = super(packing_pdfView, self).get_context_data(**kwargs)
