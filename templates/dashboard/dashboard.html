@@ -682,10 +682,16 @@ $.getJSON("/map/get_geo", function(geo){
 
         /* TAB 1: UPDATING CHART */
         // For the demo we use generated data, but normally it would be coming from the server
+        $(window).resize(function() {
+            window.m1.redraw();
+            window.m2.redraw();
+            window.m3.redraw();
+        });
+
 
         if ($('#donut-graph')) {
             $.getJSON("graph/draw_graph/Laptop/", function (json1){
-                Morris.Donut({
+                window.m1 =Morris.Donut({
                     element : 'donut-graph1',
                     data : json1,
                     resize: true,
@@ -696,7 +702,7 @@ $.getJSON("/map/get_geo", function(geo){
                 })
             });
             $.getJSON("graph/draw_graph/Projector/", function (json2){
-                Morris.Donut({
+                window.m2 =Morris.Donut({
                     element : 'donut-graph2',
                     data : json2,
                     resize: true,
@@ -707,7 +713,7 @@ $.getJSON("/map/get_geo", function(geo){
                 })
             });
             $.getJSON("graph/draw_graph/SpaceMouse/", function (json3){
-                Morris.Donut({
+                window.m3 =Morris.Donut({
                     element : 'donut-graph3',
                     data : json3,
                     resize: true,
@@ -718,6 +724,7 @@ $.getJSON("/map/get_geo", function(geo){
                 })
             });
         }
+
         /*end updating chart*/
 
         /* TAB 2: Social Network  */
