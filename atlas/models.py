@@ -224,6 +224,9 @@ class case(models.Model):
                                 max_length=200)
     def __unicode__(self):
         return self.caseName
+        ordering = ['caseName']
+
+
 ###############################################
 
 

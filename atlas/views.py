@@ -276,6 +276,7 @@ class srf_pdfView(PDFTemplateView):
         ev = get_object_or_404(event, evID=uuid)
         print ev
         context["event"] = ev
+        context["today"] = timezone.now()
         return context
 
     @method_decorator(login_required)

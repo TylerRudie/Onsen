@@ -1,5 +1,5 @@
 {% extends "pdf/pdf_base.html" %}
-
+{% load staticfiles %}
 {% block layout_style %}
     <style type="text/css" xmlns="http://www.w3.org/1999/html">
         @page {
@@ -20,57 +20,111 @@
 {% endblock %}
 
 {% block extra_style %}
+ <style type="text/css">
+        @font-face { font-family: Lato; src: url(fonts/Lato-Bol.ttf); font-weight: bold; }
+        @font-face { font-family: Lato; src: url(fonts/Lato-Reg.ttf); }
+        @font-face { font-family: "Lato Light"; src: url(fonts/Lato-Lig.ttf); }
+        html {
+            font-family: "Lato", "Helvetica", "sans-serif";
+            color: #333333;
+        }
+        p {
+            margin: 0 0 6px 0;
+            font-size: 11pt;
+            font-family: "Lato", "Helvetica", "sans-serif";
+        }
 
+     .header { color: #7f7f7f;  }
+     .header p { font-size: 13px; line-height: 1.5em; }
+     .logo { margin-left: 20px; width: 400px; padding-bottom: -20px;  }
+     .logo img { zoom: 80%; }
+     .main { margin-top: .5cm; padding-top: -10px;}
+     .event-info { border-bottom-style: solid; border-bottom-width: 1px;}
+     .requests { border-bottom-style: solid; border-bottom-width: 1px;  }
+     .shipping { border-bottom-style: solid; border-bottom-width: 1px; }
+     .main h1 { font-size: 20px; }
+     table, th, td { border: 1px solid black; border-collapse: collapse; }
+     th, td { border: 1px solid black; border-collapse: collapse; white-space: pre-wrap; }
+     colgroup { margin-top: 0px; }
+     .asset-table { font-size: 12px; }
+     .asset-table th { padding-top: 5px; text-align: center; }
+     .asset-table td { padding-left: 20px; padding-top: 5px;  }
+     .case-table { font-size: 12px; }
+     .case-table th { padding-top: 5px; text-align: center; }
+     .case-table td { padding-left: 20px; padding-top: 5px; }
+</style>
 {% endblock %}
 
 {%block page_header%}
+<div id="page-header">
+     <div class="header">
+      <p class="logo"><img src="{% static '/static/img/pdf/logoPacking.png' %}"/></p>
+     </div>
+    </div>
 
+<hr>
 {% endblock %}
 
 {% block content %}
-    <div id="content">
-    <p> {{ event.title }} </br>
-        {{ event.start }} </br>
-        {{ event.end }} </br>
-        {{ event.all_day }} </br>
-        {{ event.laptopsRequested }} </br>
-        {{ event.projectorRequested }} </br>
-        {{ event.dateShipped }} </br>
+    <div id="content" class="main">
+        <h1>Shipping Information</h1>
+   <div class="shipping">
+        <p><b>Ship Date:</b>&nbsp;{{ event.dateShipped }} </br>
+        <b>Contact Name:</b>&nbsp;{{ event.shipping_contact.lastName }}, {{ event.shipping_contact.firstName }}<br>
+        <b>Address:</b>&nbsp;{{ event.shipping_contact.address1 }}<br>
+        <b>Address:</b>&nbsp;{{ event.shipping_contact.address2 }}<br>
+        <b>City, State, Zip:</b>&nbsp;{{ event.shipping_contact.city }} {{ event.shipping_contact.zip }}, {{ event.shipping_contact.state }}</br></p>
+       </div> <!-- end shipping -->
 
-        {{ event.site }} </br>
-        {{ event.nextEvent }} </br>
-        {{ event.Transition_to_event }} </br>
-        {{ event.Transition_from_event }} </br>
-        <hr>
-        {% for item in event.hwAssigned.all %}
-            {{ item.serialNum }} | {{ item.desc }} | {{ item.outUser }} </br>
-        {% endfor %}
-
-        <hr>
-
-        {% for item in event.abAssigned.all %}
-            {{ item }} </br>
-        {% endfor %}
-        <hr>
-        {% for item in event.caseAssigned.all %}
-            {{ item.caseName }}____
-        {% endfor %}
-         </br>
-
-        <hr>
-        {{ event.shipping_contact.lastName }}, {{ event.shipping_contact.firstName }}<br>
-        {{ event.shipping_contact.address1 }}<br>
-        {{ event.shipping_contact.address2 }}<br>
-        {{ event.shipping_contact.city }} {{ event.shipping_contact.zip }}, {{ event.shipping_contact.state }}
-        <hr>
+        <h1>Event Information</h1>
+        <div class="event-info">
         {% for item in event.instructor_contact.all%}
-            {{ item.lastName }}, {{ item.firstName }} <br>
+       <b>Instructor:</b>&nbsp;{{ item.lastName }}, {{ item.firstName }}
         {% endfor %}
-        <hr>
-        {{ event.url }}
-        <hr>
-        {{ event.pool.cost_center }}
+       <p><b>Contact:</b>&nbsp;{{ event.ctAssigned }}</br>
+       <b>Event Name:</b>&nbsp; {{ event.title }} </br>
+       <b>Start Date:</b>&nbsp; {{ event.start }} </br>
+       <b>End Date: </b>&nbsp;   {{ event.end }} </br>
+       <b>All Day Event:</b>&nbsp; {{ event.all_day }}</br>
+       <b>Number of Laptops:</b>&nbsp; {{ event.laptopsRequested }}</br>
+       <b>Projector Requested:</b> &nbsp;{{ event.projectorRequested }}</br>
+       <b>Event URL:</b> &nbsp; {{ event.url }}  </br></p>
+        </div><!-- end event info -->
 
-    </p>
+        <h1>Assigned Assets</h1>
+            <div class="assignment">
+                <table class="asset-table">
+                <tr>
+              <colgroup>
+                    <th><b>Check In</b></th>
+                    <th><b>Serial Number</b></th>
+                    <th><b>Description</b></th>
+                    <th><b>User Out</b></th>
+                    <th><b>Check Out</b></th>
+              </colgroup>
+                </tr>
+             {% for item in event.hwAssigned.all %}
+                 <tr>
+                <colgroup><td>&#x274f;</td>  <td>{{ item.serialNum }}</td> <td>{{ item.desc }}</td> <td> {{ item.outUser }}</td> <td>&#x274f;</td></colgroup>
+                 </tr>
+               {% endfor %}
+        </table>
+            </div>
+        <div class ="case-table">
+            <table>
+            <tr>
+                <colgroup>
+                <th>Check In</th>
+                <th>Case Name</th>
+                <th>Check Out</th>
+                </colgroup>
+            </tr>
+                {% for item in event.caseAssigned.all %}
+                <tr>
+          <colgroup><td>&#x274f;</td> <td>{{ item.caseName }}</td> <td>&#x274f;</td></colgroup>
+               {% endfor %}
+                </tr>
+               </table>
+         </div>
     </div>
 {% endblock %}

@@ -1,0 +1,191 @@
+{% extends "pdf/pdf_base.html" %}
+
+{% block layout_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+        @page {
+            size: {{ pagesize|default:"letter landscape" }};
+            margin-left: 5mm;
+            margin-right: 5mm;
+            margin-top: 5mm;
+            margin-bottom: 5mm;
+                @frame header {
+                    -pdf-frame-content: page-header;
+                    margin-top: 5mm;
+                    margin-right: 2mm;
+                    margin-bottom: 5mm;
+                    margin-left: 1.2cm;
+                    }
+            }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+    <style type="text/css" xmlns="http://www.w3.org/1999/html">
+    .pdf_header {
+        width: 100%;
+        height: 100%;
+        display: table;
+        font-size:large;
+        text-align: center;}
+
+    .pdf_block1{
+            width: 100%;
+            height: 100%;
+            font-size:large;
+            text-align: left;}
+
+    .tg  {
+            font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+            font-size:large;
+            border-collapse:collapse;
+            border: 1px solid black;}
+
+    .tg .tg-yw4l{
+                padding-top: 2px;
+                padding-left: 2px;
+                padding-bottom: 1px;
+
+                text-align: left}
+    </style>
+{% endblock %}
+
+{%block page_header%}
+
+{% endblock %}
+
+{% block content %}
+    <div id="content">
+        <div class="pdf_header "><h1>SHIPPING INFORMATION REQUEST</h1></div>
+
+
+        <table><tr><td><h2>SENDER INFORMATION:</h2></td></tr></table>
+        <table class="tg" >
+
+              <tr>
+                <td class="tg-yw4l" >NAME<br>
+                    {{ event.pool.contact.firstName }} {{ event.pool.contact.lastName }}</td>
+                <td class="tg-yw4l" width= "40%">DATE<br>
+                    {{ today|date:"m/d/Y" }}</td>
+              </tr>
+        </table>
+        <table width="100%">
+            <tr>
+                <td width= "47%">
+                            <table class="tg" >
+                                <tr>
+                                    <td class="tg-yw4l"> MAIL CODE: <br>
+                                        135 </td>
+                                    <td class="tg-yw4l"> PHONE: <br>
+                                        {{ event.pool.contact.phone }} </td>
+                                </tr>
+                            </table>
+                            <table class="tg" >
+                                <tr>
+                                    <td class="tg-yw4l">MOC and RC  <b>(EDS)</b> <br> &nbsp; </td>
+                                </tr>
+                                <tr>
+                                    <td class="tg-yw4l">
+                                        <h4> SHIP TO: (RECIPIENT’S NAME)</h4>
+                                        INDIVIDUAL’S NAME/ATTN: <br>
+                                        {{ event.shipping_contact.firstName }} {{ event.shipping_contact.lastName }}<br>
+                                        <br>
+                                        COMPANY NAME:<br>
+                                        {{ event.shipping_contact.company }}<br>
+                                        <br>
+                                        STREET NO./ADDRESS (NO P.O. BOX)<br>
+                                        {{ event.shipping_contact.address1 }}<br>
+                                        <br>
+                                        ROOM, SUITE, MAIL CODE<br>
+                                        {{ event.shipping_contact.address2 }}<br>
+                                        <br>
+                                        CITY, STATE, ZIP CODE (Must have “Zip” on all Shipments)<br>
+                                        {{ event.shipping_contact.city }}, {{ event.shipping_contact.state }} {{ event.shipping_contact.zip }}<br>
+                                        <br>
+                                        PHONE<br>
+                                        {{ event.shipping_contact.phone }}
+                                    </td>
+                                </tr>
+                            </table>
+                </td>
+                <td width= "6%">
+
+                </td>
+                <td width= "47%">
+                            <table class="tg" >
+                                <tr>
+                                    <td class="tg-yw4l" width="100%"> NEED DATE:         <br>
+                                    {{ event.start |date:"m/d/Y"}}  &nbsp; &nbsp; &nbsp; &nbsp; ☒ AM (By 10:30)   ☐ PM</td>
+                                </tr>
+                            </table>
+                            <table class="tg" >
+                                <tr>
+                                    <td class="tg-yw4l">COST CENTER (UGS) <br>
+                                    &nbsp;{{ event.pool.cost_center }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="tg-yw4l">
+                                        <h4> SPECIAL SERVICES</h4>
+                                        ☐   No Signature Required<br>
+                                        <br>
+                                        ☐   Saturday Delivery<br>
+                                        <br>
+                                        ☐   Courier Services (For Local Deliveries)<br>
+                                        <br>
+                                        ☐   Certified Mail <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+
+
+
+                                    </td>
+                                </tr>
+                            </table>
+                </td>
+            </tr>
+        </table>
+
+        <div style="border:1px solid black;padding: 2px; font-size:large;" >
+                <b><i><font size="5">SPECIAL INSTRUCTIONS </font></i></b>
+                <br>
+                    {{ event.caseAssigned.count }} cases of laptops for {{ event.title }} event. <br>
+                    <br>
+                    {%  for case in event.caseAssigned.all %}
+                        <B> {{ case.caseName }}________</B> &nbsp;
+                    {% endfor %}
+
+        </div>
+    <br>
+        <table class="tg" >
+            <tr>
+                <td class="tg-yw4l" style="text-align: center;" width="100%">
+                <b><i><font size="4"> TO BE COMPLETED BY SHIPPING DEPARTMENT </font></i></b>
+                </td>
+            </tr>
+        </table>
+        <table class="tg" >
+            <tr>
+                <td class="tg-yw4l"  width="50%">
+                 SHIPPING CHARGES <br> &nbsp;
+                </td>
+                <td class="tg-yw4l"  width="50%">
+                FREIGHT WEIGHT <br> &nbsp;
+                </td>
+            </tr>
+        </table>
+                <table class="tg" >
+            <tr>
+                <td class="tg-yw4l"  width="100%">
+                WAY BILL NO. <br> &nbsp;   
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from datetime import timedelta, date, datetime
-
+from django.utils import timezone
 from collections import Counter
 import atlas.models
 
@@ -38,9 +38,9 @@ def get_hw_staus_stats2():
     return c.items()
 
 def get_def_startDate():
-    date = datetime.now()
-    return date.replace(hour=6, minute=0, second=0)
+    date = timezone.localtime(timezone.now())
+    return date.replace(hour=06, minute=0, second=0)
 
 def get_def_endDate():
-    date = datetime.now()
+    date = timezone.localtime(timezone.now())
     return date.replace(hour=22, minute=0, second=0)
