@@ -144,14 +144,22 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i> <span class="menu-item-parent">Reports</span></a>
+                <a href="#"><i class="fa fa-lg fa-fw fa-pencil-square-o"></i> <span class="menu-item-parent">Help</span></a>
                 <ul>
-                    <li>
-                        <a href="form-elements.html">Inventory Report</a>
-                    </li>
-                    <li>
-                        <a href="form-templates.html">Turnover Report</a>
-                    </li>
+{#                    <li>#}
+{#                        <a href="form-elements.html">Inventory Report</a>#}
+{#                    </li>#}
+{#                    <li>#}
+{#                        <a href="form-templates.html">Turnover Report</a>#}
+
+{#                    </li>#}
+                              <li><a href="{%  url 'help_event' %}">Event</a> </li>
+               <li> <a href="{%  url 'help_processing' %}" >Processing</a> </li>
+               <li> <a href="{%  url 'help_hardware' %}" >Hardware</a> </li>
+               <li> <a href="{%  url 'help_pool' %}" >Pool</a> </li>
+               <li> <a href="{%  url 'help_contact' %}" >Contact</a> </li>
+                <li> <a href="{%  url 'help_admin' %}" >Admin</a>  </li>
+
                 </ul>
             </li>
             <li class="top-menu-invisible">
@@ -164,7 +172,7 @@
                         <a href="mailto:rudie@gmail.com" target="_top"><i class="fa fa-cube"></i>Contact Support</a>
                     </li>
                     <li>
-                        <a href="help/" target="_blank"><i class="fa fa-book"></i>Documentation</a>
+{#                        <a href="help/" target="_blank"><i class="fa fa-book"></i>Documentation</a>#}
                     </li>
                 </ul>
             </li>

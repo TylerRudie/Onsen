@@ -5,14 +5,80 @@
     {{ block.super }}
 {#    ## Insert HTML Fragment Starting Here###}
     <div class="span2 well">
-        <p>
-
-        This is from the Wiki hardware
-
-
-
-        </p>
-    </div>
+        <h1>Inventory</h1>
+        <p>Inventory manager  allows user to add, edit, and remove hardware.   In addition, it can also generate reports with a list of all the  hardware and what events it is assigned to.</p>
+      <p>&nbsp;</p>
+      <h2>Adding Hardware</h2>
+      <p>To add hardware to  the inventory:
+      </p>
+      <ul>
+        <li>
+          <p>Click  on <strong>Tables</strong> on the left-side menu  to expand, then click on <strong>Inventory</strong> </p>
+        </li>
+        <li>
+          <p>New  page will open with fields for new hardware information        </p>
+        </li>
+      </ul>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/add_hardware.PNG"/>;</p>
+      <ul>
+        <li>
+          <p>In  the <strong>Serial Number</strong> field enter the  serial number of hardware you wish to add (i.e. 1YQZ87).  This field cannot be left blank.</p>
+        </li>
+        <li>
+          <p>Provide <strong>Description</strong> of hardware (i.e. Dell  Laptop)</p>
+        </li>
+        <li>
+          <p><strong>Configuration </strong>(if  unknown it can be left blank)</p>
+        </li>
+        <li>
+          <p>Select  the <strong>Type </strong>of hardware that is being  added (i.e. laptop)</p>
+        </li>
+        <li>
+          <p>For <strong>Pool ID</strong> leave on Default Pool.</p>
+        </li>
+        <li>
+          <p>Click <strong>Save</strong> button to save the information  and add the hardware to inventory.</p>
+        </li>
+      </ul>
+      <p>&nbsp;</p>
+      <h2>Searching and Editing Hardware</h2>
+      <p>Application  features instant-search which allows for faster and instant searching of  hardware items.<br />
+      To  find a specific piece of hardware, user can use the serial number.  Alternatively, you can use description or  hardware type as a search term to get a list of all the items that match that  search term.
+      </p>
+      <p>To  find a specific piece of hardware, user can use the serial number.  Alternatively, you can use description or  hardware type as a search term to get a list of all the items that match that  search term.<br />
+      To  find and edit a specific piece of equipment:</p>
+      <ul>
+        <li>
+          <p>Click on <strong>Tables</strong> to expand the menu, then click on <strong>Inventory</strong></p>
+        </li>
+        <li>          Inventory manager  page will open, with <strong>Search </strong>box near  the top        </li>
+        <li>
+          <p>To find the hardware we want to edit,  enter the serial number</p>
+        </li>
+        <li>
+          <p>Instant search will  immediately list all the items that have that serial number</p>
+        </li>
+      </ul>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/inventory_edit.PNG" />&nbsp;</p>
+      <ul>
+        <li>Click on the serial number to edit  information for that piece of hardware.</li>
+      </ul>
+      <p>&nbsp;</p>
+      <h2>&nbsp;</h2>
+      <h2>Generating Reports</h2>
+      <p>To generate reports  for hardware:</p>
+      <ul>
+        <li>
+          <p>Click on <strong>Tables</strong> on the left side menu, then click Inventory.</p>
+        </li>
+        <li>
+          <p>A new page will open with list of  hardware currently in the inventory.</p>
+        </li>
+      </ul>
+      <p>The application offers 4 options for hardware  reports: CSV, Excel, PDF, and Print.  CSV, Excel, and PDF options allow the user to  generate a file and save it in selected format.   Print option opens a new page with a list of hardware that can be  printed out.</p>
+      <p><img src="http://onsen.tech-res.net/static/img/wiki/inventory_report.PNG"/></p>
+      <p>&nbsp;</p>
+</div>
 {#     ## Insert HTML Fragment ending Here###}
 
 {% endblock %}
