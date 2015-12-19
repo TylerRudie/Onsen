@@ -111,7 +111,10 @@ def home(request):
 #    Total Revenue
     trdata = tca.aggregate(Sum('eventID__seat_revenue')).values()[0]
 
-    dollars = round(float(trdata), 2)
+    if trdata is int:
+        dollars = round(float(trdata), 2)
+    else:
+        dollars = 0
 
     tr = "$%s%s" % (intcomma(int(dollars)), ("%0.2f" % dollars)[-3:])
 
@@ -155,6 +158,15 @@ def home(request):
     else:
         tprojects_num = 0
 
+    if tlaptops > 0 :
+        total_lp = int((tla/tlaptops)*100)
+    else:
+        total_lp = 0
+    if tspacemouse > 0:
+        total_smp = int((tsma/tspacemouse)*100)
+    else:
+        total_smp = 0
+
     context = {
             "title": 'Home',
             "laptop_usage": get_hw_staus_stats(hwType='Laptop'),
@@ -169,13 +181,13 @@ def home(request):
             "total_hutilized": taup,
             "total_laptops_avail": tla,
             "total_laptops": tlaptops,
-            "total_lp": int((tla/tlaptops)*100),
+            "total_lp": total_lp,
             "total_projectors_avail": tpa,
             "total_projectors": tprojects,
             "total_pp":  tprojects_num,
             "total_sm_avail": tsma,
             "total_sm": tspacemouse,
-            "total_smp": (tsma/tspacemouse)*100,
+            "total_smp": total_smp,
             "geo_code": formatted
         }
 
