@@ -151,7 +151,7 @@ def home(request):
     tspacemouse= allhwa.filter(type='SpaceMouse').count()
 
     if tprojects > 0:
-        tprojects_num =  (tla/tlaptops)*100
+        tprojects_num =  int((tla/tlaptops)*100)
     else:
         tprojects_num = 0
 
@@ -169,7 +169,7 @@ def home(request):
             "total_hutilized": taup,
             "total_laptops_avail": tla,
             "total_laptops": tlaptops,
-            "total_lp": (tla/tlaptops)*100,
+            "total_lp": int((tla/tlaptops)*100),
             "total_projectors_avail": tpa,
             "total_projectors": tprojects,
             "total_pp":  tprojects_num,
@@ -187,7 +187,7 @@ def draw_graph(request, x="None"):
     hwtype = hardware.objects.filter(type=x).exclude(poolID_id=retiredpools)
     total = hwtype.count()
     free = hwtype.filter(available=1).count()
-    percent = (free/total)*100
+    percent = int((free/total)*100)
 
     graph_data = []
 
@@ -417,7 +417,7 @@ def edit_event(request, uuid=None):
 
 
 class packing_pdfView(PDFTemplateView):
-    template_name = "pdf/pdf_packing.html"
+    template_name = "pdf/pdf_packing_rudie.html"
 
     def get_context_data(self, **kwargs):
         context = super(packing_pdfView, self).get_context_data(**kwargs)
@@ -434,7 +434,7 @@ class packing_pdfView(PDFTemplateView):
 
 
 class srf_pdfView(PDFTemplateView):
-    template_name = "pdf/pdf_srf.html"
+    template_name = "pdf/pdf_srf_rudie.html"
 
     def get_context_data(self, **kwargs):
         context = super(srf_pdfView, self).get_context_data(**kwargs)
