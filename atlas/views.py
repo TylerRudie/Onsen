@@ -110,12 +110,12 @@ def home(request):
                                         )
 #    Total Revenue
     trdata = tca.aggregate(Sum('eventID__seat_revenue')).values()[0]
-
-    if trdata is int:
+    print trdata
+    if trdata is not None:
         dollars = round(float(trdata), 2)
     else:
         dollars = 0
-
+    print dollars
     tr = "$%s%s" % (intcomma(int(dollars)), ("%0.2f" % dollars)[-3:])
 
 #     Total Events
